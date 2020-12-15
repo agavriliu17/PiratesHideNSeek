@@ -5,7 +5,6 @@
 #include <mmsystem.h>
 using namespace std;
 #define N 3
-#define CLIP_ON 1
 
 // rgb colors
 int black[3] = {0,0,0};
@@ -114,10 +113,6 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
     mouseX=mousex();
     mouseY=mousey();
-    if(mouseX > 535 && mouseX < 866 && mouseY > 372+140 && mouseY < 427+140){
-        cout<<mouseX<<" "<<mouseY;
-        menu();
-    }
 }
 
 int settings(){ //plaseaza fundalul si textul ferestrei setari
@@ -137,7 +132,7 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
             pressed=1;
             levels();
         }
-        if(mouseX > (screenWidth/2 - 200) && mouseX < (screenWidth/2 +200) && mouseY > (screenHeight/4 + 360) && mouseY < (screenHeight/4 + 440) && pressed==0){
+        if(mouseX > 575 && mouseX < 866 && mouseY > 560 && mouseY < 632 && pressed==0){
             clearmouseclick(WM_LBUTTONDOWN);
             gameOpen = false;
         }
