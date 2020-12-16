@@ -19,9 +19,9 @@ int blue_1[3] = {0, 105, 148};
 int screenWidth = 1400;
 int screenHeight = 684;
 int screen_poly[8] = {0,0, screenWidth,0, screenWidth,screenHeight, 0,screenHeight}; //lista ce determina coordonatele poligonului ecranului
-bool gameOpen = true;
+bool gameOpen = true, music=true;
 int mouseX, mouseY; //coordonatele mouse-ului
-int pressed=0; //variabila pentru butoane din diferite meniuri
+int pressed=0, step=1; //variabila pentru butoane din diferite meniuri
 
 bool in_menu = true; //variabila ce verifica daca ne aflam in meniu
 bool in_levels = false; //verifica daca ne aflam in pagina cu nivele
@@ -174,17 +174,57 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
 
     bar(307, 609, 452, 664);
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
-    getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
-    mouseX=mousex();
-    mouseY=mousey();
 }
+void playMusic(bool music){
+  if (music==true)
+    PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
+  else
+    PlaySound(NULL, 0, 0);
+}
+void settings(){ //plaseaza fundalul si textul ferestrei setari
+    readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
+    setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    setbkcolor(COLOR(139, 194, 234));
 
-int settings(){ //plaseaza fundalul si textul ferestrei setari
-    bool settingsOpen = true;
-    while(settingsOpen){
-        ;
-    }
-    return 1;
+    //music
+    bar(452, 340, 614, 395);
+    outtextxy(533-textwidth("MUSIC")/2, 367-textheight("M")/2, "MUSIC");
+    bar(853, 340, 936, 395);
+    outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+
+
+    //language
+    settextstyle(BOLD_FONT, HORIZ_DIR, 4);
+    bar(453, 442, 614, 497);
+    outtextxy(534-textwidth("LANGUAGE")/2, 470-textheight("L")/2, "LANGUAGE");
+    bar(853, 446, 936, 501);
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    outtextxy(895-textwidth("EN")/2, 474-textheight("E")/2, "EN");
+
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    bar(307, 609, 452, 664);
+    outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+}
+void howto(int step)
+{
+    if(step==1)
+        readimagefile("howto1.jpg",0,0,screenWidth,screenHeight);
+    else
+        if (step==2)
+        readimagefile("howto2.jpg",0,0,screenWidth,screenHeight);
+            else
+                readimagefile("howto3.jpg",0,0,screenWidth,screenHeight);
+
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    bar(628, 590, 773, 645);
+    if(step<3)
+        outtextxy(700-textwidth("NEXT")/2, 618-textheight("N")/2, "NEXT");
+    else
+        outtextxy(700-textwidth("OK")/2, 618-textheight("O")/2, "OK");
 }
 
 void board(){
@@ -222,8 +262,12 @@ void board(){
 
 bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
     while(gameOpen){
+
+
+       // primul meniu pressed=0
+
         getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
-       // PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME); va fi mutat intr o functie ce va fi apelata in setari
+        //PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME); va fi mutat intr o functie ce va fi apelata in setari
        // Folosim variabilele 'in_menu', 'in_levels', 'gameStarted' in loc de variabila pressed pentru lucru mai usor cu
        // programul si o structura mai simpla
 
@@ -298,16 +342,71 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
             pressed=1;
             levels();
         }
+        if(mouseX > 575 && mouseX < 829 && mouseY > 440 && mouseY < 512 && pressed==0){
+            clearmouseclick(WM_LBUTTONDOWN);
+            pressed=2;
+            settings();
+        }
+
+        // settings pressed=2
+        if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395 && pressed==2){
+            clearmouseclick(WM_LBUTTONDOWN);
+            if (music==true)
+            {
+                music=false;
+                playMusic(music);
+                setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+                settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                setbkcolor(COLOR(139, 194, 234));
+                bar(853, 340, 936, 395);
+                outtextxy(895-textwidth("OFF")/2, 367-textheight("O")/2, "OFF");
+            }
+            else
+            {
+                music=true;
+                playMusic(music);
+                setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+                settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                setbkcolor(COLOR(139, 194, 234));
+                bar(853, 340, 936, 395);
+                outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+            }
+        }
+
+        // exit
         if(mouseX > 575 && mouseX < 866 && mouseY > 560 && mouseY < 632 && pressed==0){
             clearmouseclick(WM_LBUTTONDOWN);
             gameOpen = false;
         }
+
         // nivele
         if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && pressed==1){
             pressed=0;
             menu();
         }*/
 
+
+        // nivele pressed=1
+        if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && (pressed==1 || pressed==2)){
+            pressed=0;
+            menu();
+        }
+        if(mouseX > 534 && mouseX < 865 && mouseY > 257 && mouseY < 311 && pressed==1){
+            clearmouseclick(WM_LBUTTONDOWN);
+            pressed=3;
+            step=1;
+            howto(step);
+        }
+        // how-to-play pressed=3
+         if(mouseX > 628 && mouseX < 773 && mouseY > 590 && mouseY < 645 && pressed==3){
+            step++;
+            if(step==4){
+                pressed=1;
+                levels();
+            }
+            else
+            howto(step);
+         }
     }
     return gameOpen;
 }
@@ -316,6 +415,7 @@ int main(){
 
     initwindow(screenWidth,screenHeight);
     menu();
+    playMusic(music);
     startGame();
 
     closegraph();
