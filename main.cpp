@@ -11,6 +11,10 @@ int black[3] = {0,0,0};
 int white[3] = {255,255,255};
 int dark_blue[3] = {29, 85, 173};
 int sea_blue[3] = {152, 65, 21};
+int green[3] = {0,255,0};
+int light_blue[3] = {12, 164, 255};
+int blue_1[3] = {0, 105, 148};
+
 //global variables
 int screenWidth = 1400;
 int screenHeight = 684;
@@ -18,6 +22,21 @@ int screen_poly[8] = {0,0, screenWidth,0, screenWidth,screenHeight, 0,screenHeig
 bool gameOpen = true;
 int mouseX, mouseY; //coordonatele mouse-ului
 int pressed=0; //variabila pentru butoane din diferite meniuri
+
+bool in_menu = true; //variabila ce verifica daca ne aflam in meniu
+bool in_levels = false; //verifica daca ne aflam in pagina cu nivele
+bool gameStarted = false; //variabila ce verifica daca s-a inceput jocul
+
+//variabile pentru logica matricelor
+int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
+bool is_selected = false;
+bool available[4] = {1,1,1,1};
+int shapes[4][3][3] =  {1,0,1,1,1,1,0,1,0,
+                        1,0,1,1,1,1,1,0,1,
+                        1,1,0,0,1,0,1,1,1,
+                        1,1,1,0,0,1,0,0,1};
+
+
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
@@ -50,6 +69,51 @@ void fill_rect(int x, int y, int size_x, int size_y, int color[3]){ //umple un d
     fillpoly(4,shape);
 
 }
+
+void draw_shape(int m[3][3], int x, int y, int lsize){
+    int initial_x = x;
+    for(int i=0;i<3;i++){
+        //cout<<"Row "<<i+1<<": ("<<y<<")"<<endl;
+        for(int j=0;j<3;j++){
+            //cout<<"X"<<j+1<<" coordinate = "<<x<<endl;
+            if(m[i][j] != 0){
+                square(x,y,lsize,true,light_blue);
+            }
+
+            x+=lsize;
+        }
+        //cout<<"---"<<endl;
+        x = initial_x;
+        y += lsize;
+    }
+}
+
+void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int gap){
+    //c_x++; c_y++;
+    //c_size -= 2;
+    int shape_length = (c_size - gap)/2;
+    int shape_size = shape_length / 3;
+    draw_shape(matrix[0],c_x,c_y,shape_size);
+    draw_shape(matrix[1],(c_x + gap + shape_length),c_y,shape_size);
+    draw_shape(matrix[2],c_x,(c_y + gap + shape_length),shape_size);
+    draw_shape(matrix[3],(c_x + gap + shape_length),(c_y + gap + shape_length),shape_size);
+
+}
+
+bool in_border(int mX, int mY, int x, int y, int x1, int y1){
+    if (mX >= x && mX <= x1 && mY >= y && mY <= y1) return true;
+    return false;
+}
+
+void copy_matrix(int m1[3][3], int m2[3][3]){//copie m2 in m1
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            m1[i][j] = m2[i][j];
+        }
+    }
+}
+
+
 
 void menu(){ //plaseaza fundalul si textul ferestrei de meniu
     readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
@@ -122,12 +186,114 @@ int settings(){ //plaseaza fundalul si textul ferestrei setari
     }
     return 1;
 }
+
+void board(){
+    readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+
+    //The board:
+    //bar( (screenWidth/4 - 243), (screenHeight/2 - 243), (screenWidth/4 + 242), (screenHeight/2 + 242) );
+    readimagefile("img2.jpg",(screenWidth/4 - 243) ,(screenHeight/2 - 243),(screenWidth/4 + 242),(screenHeight/2 + 242));
+
+    //Sector 1 coordinates: (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13)
+
+    //Sector 2 coordinates: (screenWidth/4 + 12) ,(screenHeight/2 - 243), (screenWidth/4 + 242) ,(screenHeight/2 - 13)
+
+    //Sector 3 coordinates: (screenWidth/4 - 243) ,(screenHeight/2 + 12), (screenWidth/4 - 13) ,(screenHeight/2 + 242)
+
+    //Sector 4 coordinates: (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242)
+
+
+    //The shapes:
+    setfillstyle(SOLID_FILL, COLOR(0, 105, 148)); //sea_blue
+    bar( (3*screenWidth/4 - 243), (screenHeight/2 - 243), (3*screenWidth/4 + 242), (screenHeight/2 + 242) );
+    shape_container(shapes, (3*screenWidth/4 - 243), (screenHeight/2 - 243), 485, 25);
+
+    //Shape 1 coordinates: (3*screenWidth/4 - 243) , (screenHeight/2 - 243), (3*screenWidth/4 - 13), (screenHeight/2 - 13)
+
+    //Shape 2 coordinates: (3*screenWidth/4 + 12) , (screenHeight/2 - 243), (3*screenWidth/4 + 242), (screenHeight/2 - 13)
+
+    //Shape 3 coordinates: (3*screenWidth/4 - 243) , (screenHeight/2 + 12), (3*screenWidth/4 - 13), (screenHeight/2 + 242)
+
+    //Shape 4 coordinates: (3*screenWidth/4 + 12) , (screenHeight/2 + 12), (3*screenWidth/4 + 242), (screenHeight/2 + 242)
+}
+
+
 bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
     while(gameOpen){
-       // PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME); va fi mutat intr o functie ce va fi apelata in setari
-       // primul meniu
         getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
-        if(mouseX > 575 && mouseX < 829 && mouseY > 320 && mouseY < 392 && pressed==0){
+       // PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME); va fi mutat intr o functie ce va fi apelata in setari
+       // Folosim variabilele 'in_menu', 'in_levels', 'gameStarted' in loc de variabila pressed pentru lucru mai usor cu
+       // programul si o structura mai simpla
+
+        if(in_menu){//atat timp cat suntem in meniu
+            if(in_border(mouseX, mouseY, 575, 320, 829, 392)){ //intram pe pagina cu nivele
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_levels = true; in_menu = false;
+                levels();
+            }
+            if(in_border(mouseX, mouseY, 575,560, 866,632)){ //inchidem jocul
+                clearmouseclick(WM_LBUTTONDOWN);
+                gameOpen = false;
+            }
+        }
+        if(in_levels){//atat timp cat suntem pe pagina 'nivele'
+            if(in_border(mouseX, mouseY, 307,609, 452,664)){ //revenim in meniu
+                in_levels = false; in_menu = true;
+                menu();
+            }
+            if(in_border(mouseX,mouseY,535, 372, 866, 427)){//nivelul starter
+                clearmouseclick(WM_LBUTTONDOWN);
+                gameStarted = true; in_levels = false;
+                board();
+            }
+        }
+        if(gameStarted){
+
+
+                        //selectarea figurilor
+            if(in_border(mouseX,mouseY, (3*screenWidth/4 - 243) , (screenHeight/2 - 243), (3*screenWidth/4 - 13), (screenHeight/2 - 13)) && available[0]){
+                copy_matrix(selected_matrix , shapes[0]);
+                square((3*screenWidth/4 - 243) , (screenHeight/2 - 243),230,true,blue_1); is_selected = true;
+                available[0] = 0;
+            }
+            if(in_border(mouseX,mouseY, (3*screenWidth/4 + 12) , (screenHeight/2 - 243), (3*screenWidth/4 + 242), (screenHeight/2 - 13)) && available[1]){
+                copy_matrix(selected_matrix , shapes[1]);
+                square((3*screenWidth/4 + 12) , (screenHeight/2 - 243),230,true,blue_1); is_selected = true;
+                available[1] = 0;
+            }
+            if(in_border(mouseX,mouseY, (3*screenWidth/4 - 243) , (screenHeight/2 + 12), (3*screenWidth/4 - 13), (screenHeight/2 + 242)) && available[2]){
+                copy_matrix(selected_matrix , shapes[2]);
+                square((3*screenWidth/4 - 243) , (screenHeight/2 + 12),230,true,blue_1); is_selected = true;
+                available[2] = 0;
+            }
+            if(in_border(mouseX,mouseY, (3*screenWidth/4 + 12) , (screenHeight/2 + 12), (3*screenWidth/4 + 242), (screenHeight/2 + 242)) && available[3]){
+                copy_matrix(selected_matrix , shapes[3]);
+                square((3*screenWidth/4 + 12) , (screenHeight/2 + 12),230,true,blue_1); is_selected = true;
+                available[3] = 0;
+            }
+
+
+                        //plasarea figurilor
+            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13))){
+                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 - 243),230/3); is_selected = false;
+            }
+
+            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 - 243), (screenWidth/4 + 242) ,(screenHeight/2 - 13))){
+                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 - 243),230/3); is_selected = false;
+            }
+
+            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 + 12), (screenWidth/4 - 13) ,(screenHeight/2 + 242))){
+                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 + 12),230/3); is_selected = false;
+            }
+
+            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242))){
+                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false;
+            }
+        }
+
+        /*if(mouseX > 575 && mouseX < 829 && mouseY > 320 && mouseY < 392 && pressed==0){
             clearmouseclick(WM_LBUTTONDOWN);
             pressed=1;
             levels();
@@ -138,9 +304,9 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
         }
         // nivele
         if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && pressed==1){
-        pressed=0;
-        menu();
-        }
+            pressed=0;
+            menu();
+        }*/
 
     }
     return gameOpen;
