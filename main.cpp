@@ -73,6 +73,7 @@ void fill_rect(int x, int y, int size_x, int size_y, int color[3]){ //umple un d
 }
 
 void draw_shape(int m[3][3], int x, int y, int lsize){
+    //setcolor(RGB(light_blue[0], light_blue[1], light_blue[2]));
     int initial_x = x;
     for(int i=0;i<3;i++){
         //cout<<"Row "<<i+1<<": ("<<y<<")"<<endl;
@@ -178,12 +179,12 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
 
-void playMusic(bool music){
+/*void playMusic(bool music){
   if (music==true)
     PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
     PlaySound(NULL, 0, 0);
-}
+}*/
 
 void settings(){ //plaseaza fundalul si textul ferestrei setari
     readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
@@ -269,8 +270,32 @@ void board(){
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
     bar(307, 609, 452, 664);
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    bar(970, 609, 1145, 664);
+    outtextxy(975, 615, "RETRY");
 }
 
+void retry_level(){
+    for(int i=0;i<4;i++){
+        available[i] = true;
+    }
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            selected_matrix[i][j] = 0;
+        }
+    }
+    board();
+}
+
+void close_level(){
+    for(int i=0;i<4;i++){
+        available[i] = true;
+    }
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            selected_matrix[i][j] = 0;
+        }
+    }
+}
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
     bool draw = true; //pentru HOW TO
@@ -362,9 +387,18 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false;
             }
 
+
+                        //Retry
+
+            if(in_border(mouseX, mouseY, 970, 609, 1145, 664)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                retry_level();
+            }
+
                         //Back
             if (in_border(mouseX, mouseY, 307, 609, 452, 664)){
                 in_levels = true; gameStarted = false;
+                close_level();
                 levels();
             }
         }
@@ -375,7 +409,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 if (music==true)
                 {
                     music=false;
-                    playMusic(music);
+                    //playMusic(music);
                     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
@@ -385,7 +419,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 else
                 {
                     music=true;
-                    playMusic(music);
+                    //playMusic(music);
                     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
@@ -417,83 +451,11 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     in_tutorial = false; in_levels = true;
                     levels();
                 }
-
             }
 
-
-
         }
 
-        /*if(mouseX > 575 && mouseX < 829 && mouseY > 320 && mouseY < 392 && pressed==0){
-            clearmouseclick(WM_LBUTTONDOWN);
-            pressed=1;
-            levels();
-        }
-        if(mouseX > 575 && mouseX < 829 && mouseY > 440 && mouseY < 512 && pressed==0){
-            clearmouseclick(WM_LBUTTONDOWN);
-            pressed=2;
-            settings();
-        }
 
-        // settings pressed=2
-        if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395 && pressed==2){
-            clearmouseclick(WM_LBUTTONDOWN);
-            if (music==true)
-            {
-                music=false;
-                playMusic(music);
-                setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
-                settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-                setbkcolor(COLOR(139, 194, 234));
-                bar(853, 340, 936, 395);
-                outtextxy(895-textwidth("OFF")/2, 367-textheight("O")/2, "OFF");
-            }
-            else
-            {
-                music=true;
-                playMusic(music);
-                setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
-                settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-                setbkcolor(COLOR(139, 194, 234));
-                bar(853, 340, 936, 395);
-                outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
-            }
-        }
-
-        // exit
-        if(mouseX > 575 && mouseX < 866 && mouseY > 560 && mouseY < 632 && pressed==0){
-            clearmouseclick(WM_LBUTTONDOWN);
-            gameOpen = false;
-        }
-
-        // nivele
-        if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && pressed==1){
-            pressed=0;
-            menu();
-        }*/
-
-        /*
-        // nivele pressed=1
-        if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && (pressed==1 || pressed==2)){
-            pressed=0;
-            menu();
-        }
-        if(mouseX > 534 && mouseX < 865 && mouseY > 257 && mouseY < 311 && pressed==1){
-            clearmouseclick(WM_LBUTTONDOWN);
-            pressed=3;
-            step=1;
-            howto(step);
-        }
-        // how-to-play pressed=3
-         if(mouseX > 628 && mouseX < 773 && mouseY > 590 && mouseY < 645 && pressed==3){
-            step++;
-            if(step==4){
-                pressed=1;
-                levels();
-            }
-            else
-            howto(step);
-         }*/
     }
     return gameOpen;
 }
