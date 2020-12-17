@@ -26,6 +26,8 @@ int pressed=0, step=1; //variabila pentru butoane din diferite meniuri
 bool in_menu = true; //variabila ce verifica daca ne aflam in meniu
 bool in_levels = false; //verifica daca ne aflam in pagina cu nivele
 bool gameStarted = false; //variabila ce verifica daca s-a inceput jocul
+bool in_settings = false; //variabila ce verifica daca suntem in setari
+bool in_tutorial = false;
 
 //variabile pentru logica matricelor
 int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
@@ -175,12 +177,14 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     bar(307, 609, 452, 664);
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
+
 void playMusic(bool music){
   if (music==true)
     PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
     PlaySound(NULL, 0, 0);
 }
+
 void settings(){ //plaseaza fundalul si textul ferestrei setari
     readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
@@ -207,6 +211,7 @@ void settings(){ //plaseaza fundalul si textul ferestrei setari
     bar(307, 609, 452, 664);
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
+
 void howto(int step)
 {
     if(step==1)
@@ -257,10 +262,18 @@ void board(){
     //Shape 3 coordinates: (3*screenWidth/4 - 243) , (screenHeight/2 + 12), (3*screenWidth/4 - 13), (screenHeight/2 + 242)
 
     //Shape 4 coordinates: (3*screenWidth/4 + 12) , (screenHeight/2 + 12), (3*screenWidth/4 + 242), (screenHeight/2 + 242)
+
+    //Back button
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    bar(307, 609, 452, 664);
+    outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
 
 
-bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
+bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
+    bool draw = true; //pentru HOW TO
     while(gameOpen){
 
 
@@ -277,13 +290,20 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
                 in_levels = true; in_menu = false;
                 levels();
             }
+            if(in_border(mouseX, mouseY, 575, 320+120, 829, 392+120)){ //intram in setari
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_settings = true; in_menu = false;
+                settings();
+            }
             if(in_border(mouseX, mouseY, 575,560, 866,632)){ //inchidem jocul
                 clearmouseclick(WM_LBUTTONDOWN);
                 gameOpen = false;
             }
         }
+
         if(in_levels){//atat timp cat suntem pe pagina 'nivele'
             if(in_border(mouseX, mouseY, 307,609, 452,664)){ //revenim in meniu
+                clearmouseclick(WM_LBUTTONDOWN);
                 in_levels = false; in_menu = true;
                 menu();
             }
@@ -292,6 +312,12 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
                 gameStarted = true; in_levels = false;
                 board();
             }
+            if(in_border(mouseX,mouseY,534, 257, 865, 311)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_levels = false; in_tutorial = true;
+                step = 1;
+            }
+
         }
         if(gameStarted){
 
@@ -335,6 +361,67 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
             if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242))){
                 draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false;
             }
+
+                        //Back
+            if (in_border(mouseX, mouseY, 307, 609, 452, 664)){
+                in_levels = true; gameStarted = false;
+                levels();
+            }
+        }
+
+        if(in_settings){
+            if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395){ //music on/off
+                clearmouseclick(WM_LBUTTONDOWN);
+                if (music==true)
+                {
+                    music=false;
+                    playMusic(music);
+                    setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+                    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                    setbkcolor(COLOR(139, 194, 234));
+                    bar(853, 340, 936, 395);
+                    outtextxy(895-textwidth("OFF")/2, 367-textheight("O")/2, "OFF");
+                }
+                else
+                {
+                    music=true;
+                    playMusic(music);
+                    setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+                    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                    setbkcolor(COLOR(139, 194, 234));
+                    bar(853, 340, 936, 395);
+                    outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+                }
+            }
+            if(in_border(mouseX,mouseY,307, 609, 452, 664)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_settings = false; in_menu = true;
+                menu();
+            }
+        }
+
+        if(in_tutorial){
+
+            if(draw){
+                draw = false;
+                howto(step);
+            }
+
+            if(in_border(mouseX, mouseY, 628, 590, 773, 645)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                if(step < 3){
+                    step ++;
+                    draw = true;
+                }
+                else{
+                    in_tutorial = false; in_levels = true;
+                    levels();
+                }
+
+            }
+
+
+
         }
 
         /*if(mouseX > 575 && mouseX < 829 && mouseY > 320 && mouseY < 392 && pressed==0){
@@ -385,7 +472,7 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
             menu();
         }*/
 
-
+        /*
         // nivele pressed=1
         if(mouseX > 307 && mouseX < 452 && mouseY > 609 && mouseY < 664 && (pressed==1 || pressed==2)){
             pressed=0;
@@ -406,7 +493,7 @@ bool startGame(){ // ciclul principal al jocului unde are loc procesarea logicii
             }
             else
             howto(step);
-         }
+         }*/
     }
     return gameOpen;
 }
@@ -415,7 +502,7 @@ int main(){
 
     initwindow(screenWidth,screenHeight);
     menu();
-    playMusic(music);
+    //playMusic(music);
     startGame();
 
     closegraph();
