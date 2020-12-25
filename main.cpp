@@ -3,6 +3,8 @@
 #include <winbgim.h>
 #include <windows.h>
 #include <mmsystem.h>
+#include <fstream>
+#include <ctime>
 using namespace std;
 #define N 3
 
@@ -38,7 +40,34 @@ int shapes[4][3][3] =  {1,0,1,1,1,1,0,1,0,
                         1,1,0,0,1,0,1,1,1,
                         1,1,1,0,0,1,0,0,1};
 
+void read_shapes(){
+    ifstream fi;
+    string aux;
+    fi.open("islands.in", ios::in);
+    srand(time(0));
+    int na[4] = {-1,-1,-1,-1}, rng, k = 0;
+    while(k < 4){
+        rng = rand() % 10;
+        if(rng != na[0] && rng != na[1] && rng != na[2] && rng != na[3]){
+            //cout<<"The line is: "<<rng+1<<endl;
+            for(int f = 0; f < rng; f++){
+                getline(fi, aux);
+            }
+            //getline(fi,aux);
+            //cout<<aux<<endl;
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 3; j++){
+                    fi>>shapes[k][i][j];
 
+                }
+            }
+            na[k] = rng;
+            k++;
+            fi.clear();
+            fi.seekg(0, ios::beg);
+        }
+    }
+}
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
@@ -335,6 +364,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             if(in_border(mouseX,mouseY,535, 372, 866, 427)){//nivelul starter
                 clearmouseclick(WM_LBUTTONDOWN);
                 gameStarted = true; in_levels = false;
+                read_shapes();
                 board();
             }
             if(in_border(mouseX,mouseY,534, 257, 865, 311)){
@@ -454,8 +484,6 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
 
         }
-
-
     }
     return gameOpen;
 }
