@@ -35,10 +35,34 @@ bool in_tutorial = false;
 int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
 bool is_selected = false;
 bool available[4] = {1,1,1,1};
-int shapes[4][3][3] =  {1,0,1,1,1,1,0,1,0,
-                        1,0,1,1,1,1,1,0,1,
-                        1,1,0,0,1,0,1,1,1,
-                        1,1,1,0,0,1,0,0,1};
+bool placed[4] = {0,0,0,0};
+int shapes[4][3][3];
+int board_matrix[4][3][3];
+
+void refresh_board(int squares, int first_poz){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
+                                                //                                        first_poz - de la care patrat incepem citirea
+    ifstream fi; string aux;
+    fi.open("board_matrix.in", ios::in);
+    int k = 0;
+    if(first_poz+squares > 4){
+        cout<<"Error, square out of range!"<<endl;
+        return;
+    }
+    while(k < first_poz){
+        getline(fi,aux);
+        k++;
+    }
+    k = 0;
+    while(k < squares){
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                fi>>board_matrix[first_poz+k][i][j];
+            }
+        }
+        k++;
+    }
+    fi.close();
+}
 
 void read_shapes(){
     ifstream fi;
@@ -67,6 +91,7 @@ void read_shapes(){
             fi.seekg(0, ios::beg);
         }
     }
+    fi.close();
 }
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
@@ -312,6 +337,7 @@ void retry_level(){
             selected_matrix[i][j] = 0;
         }
     }
+    refresh_board(4,0);
     board();
 }
 
@@ -328,6 +354,7 @@ void close_level(){
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
     bool draw = true; //pentru HOW TO
+    refresh_board(4,0);
     while(gameOpen){
 
 
@@ -401,20 +428,24 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 
 
                         //plasarea figurilor
-            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13))){
-                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 - 243),230/3); is_selected = false;
+            if (!placed[0] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13))){
+                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 - 243),230/3); is_selected = false; placed[0] = 1;
+                hide_matrix(board_matrix[0],selected_matrix);
             }
 
-            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 - 243), (screenWidth/4 + 242) ,(screenHeight/2 - 13))){
-                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 - 243),230/3); is_selected = false;
+            if (!placed[1] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 - 243), (screenWidth/4 + 242) ,(screenHeight/2 - 13))){
+                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 - 243),230/3); is_selected = false; placed[1] = 1;
+                hide_matrix(board_matrix[1],selected_matrix);
             }
 
-            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 + 12), (screenWidth/4 - 13) ,(screenHeight/2 + 242))){
-                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 + 12),230/3); is_selected = false;
+            if (!placed[2] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 + 12), (screenWidth/4 - 13) ,(screenHeight/2 + 242))){
+                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 + 12),230/3); is_selected = false; placed[2] = 1;
+                hide_matrix(board_matrix[2],selected_matrix);
             }
 
-            if (is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242))){
-                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false;
+            if (!placed[3] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242))){
+                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false; placed[3] = 1;
+                hide_matrix(board_matrix[3],selected_matrix);
             }
 
 
@@ -496,5 +527,14 @@ int main(){
     startGame();
 
     closegraph();
+    for(int k=0;k<4;k++){
+        cout<<"Square "<<k<<":"<<endl;
+        for(int i=0;i<3;i++){
+            for(int j=0; j<3; j++){
+                cout<<board_matrix[k][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+    }
     return 0;
 }
