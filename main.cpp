@@ -3,6 +3,8 @@
 #include <winbgim.h>
 #include <windows.h>
 #include <mmsystem.h>
+#include <fstream>
+#include <ctime>
 using namespace std;
 #define N 3
 
@@ -42,6 +44,64 @@ struct coordonatePiese {
     int x, y;
 }matrix_coord[4];
 
+//Auxiliar plan vechi
+int board_matrix[4][3][3];
+
+void refresh_board(int squares, int first_poz){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
+                                                //                                        first_poz - de la care patrat incepem citirea
+    ifstream fi; string aux;
+    fi.open("board_matrix.in", ios::in);
+    int k = 0;
+    if(first_poz+squares > 4){
+        cout<<"Error, square out of range!"<<endl;
+        return;
+    }
+    while(k < first_poz){
+        getline(fi,aux);
+        k++;
+    }
+    k = 0;
+    while(k < squares){
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                fi>>board_matrix[first_poz+k][i][j];
+            }
+        }
+        k++;
+    }
+    fi.close();
+}
+
+void read_shapes(){
+    ifstream fi;
+    string aux;
+    fi.open("islands.in", ios::in);
+    srand(time(0));
+    int na[4] = {-1,-1,-1,-1}, rng, k = 0;
+    while(k < 4){
+        rng = rand() % 10;
+        if(rng != na[0] && rng != na[1] && rng != na[2] && rng != na[3]){
+            //cout<<"The line is: "<<rng+1<<endl;
+            for(int f = 0; f < rng; f++){
+                getline(fi, aux);
+            }
+            //getline(fi,aux);
+            //cout<<aux<<endl;
+            for(int i = 0; i < 3; i++){
+                for(int j = 0; j < 3; j++){
+                    fi>>shapes[k][i][j];
+
+                }
+            }
+            na[k] = rng;
+            k++;
+            fi.clear();
+            fi.seekg(0, ios::beg);
+        }
+    }
+    fi.close();
+}
+//End
 
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
