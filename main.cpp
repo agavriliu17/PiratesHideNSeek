@@ -3,8 +3,6 @@
 #include <winbgim.h>
 #include <windows.h>
 #include <mmsystem.h>
-#include <fstream>
-#include <ctime>
 using namespace std;
 #define N 3
 
@@ -14,8 +12,9 @@ int white[3] = {255,255,255};
 int dark_blue[3] = {29, 85, 173};
 int sea_blue[3] = {152, 65, 21};
 int green[3] = {0,255,0};
-int light_blue[3] = {12, 164, 255};
+int light_blue[3] = {14, 197, 219};
 int blue_1[3] = {0, 105, 148};
+int blue_2[3]={71, 179, 191};
 
 //global variables
 int screenWidth = 1400;
@@ -35,64 +34,15 @@ bool in_tutorial = false;
 int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
 bool is_selected = false;
 bool available[4] = {1,1,1,1};
-bool placed[4] = {0,0,0,0};
-int shapes[4][3][3];
-int board_matrix[4][3][3];
+int shapes[4][3][3] =  {1,1,1,1,1,1,0,1,0,
+                        1,1,1,1,0,1,0,1,1,
+                        0,1,1,1,1,1,1,1,1,
+                        0,1,1,1,1,1,1,1,0};
+struct coordonatePiese {
+    int x, y;
+}matrix_coord[4];
 
-void refresh_board(int squares, int first_poz){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
-                                                //                                        first_poz - de la care patrat incepem citirea
-    ifstream fi; string aux;
-    fi.open("board_matrix.in", ios::in);
-    int k = 0;
-    if(first_poz+squares > 4){
-        cout<<"Error, square out of range!"<<endl;
-        return;
-    }
-    while(k < first_poz){
-        getline(fi,aux);
-        k++;
-    }
-    k = 0;
-    while(k < squares){
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-                fi>>board_matrix[first_poz+k][i][j];
-            }
-        }
-        k++;
-    }
-    fi.close();
-}
 
-void read_shapes(){
-    ifstream fi;
-    string aux;
-    fi.open("islands.in", ios::in);
-    srand(time(0));
-    int na[4] = {-1,-1,-1,-1}, rng, k = 0;
-    while(k < 4){
-        rng = rand() % 10;
-        if(rng != na[0] && rng != na[1] && rng != na[2] && rng != na[3]){
-            //cout<<"The line is: "<<rng+1<<endl;
-            for(int f = 0; f < rng; f++){
-                getline(fi, aux);
-            }
-            //getline(fi,aux);
-            //cout<<aux<<endl;
-            for(int i = 0; i < 3; i++){
-                for(int j = 0; j < 3; j++){
-                    fi>>shapes[k][i][j];
-
-                }
-            }
-            na[k] = rng;
-            k++;
-            fi.clear();
-            fi.seekg(0, ios::beg);
-        }
-    }
-    fi.close();
-}
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
@@ -126,7 +76,7 @@ void fill_rect(int x, int y, int size_x, int size_y, int color[3]){ //umple un d
 
 }
 
-void draw_shape(int m[3][3], int x, int y, int lsize){
+void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){
     //setcolor(RGB(light_blue[0], light_blue[1], light_blue[2]));
     int initial_x = x;
     for(int i=0;i<3;i++){
@@ -134,7 +84,7 @@ void draw_shape(int m[3][3], int x, int y, int lsize){
         for(int j=0;j<3;j++){
             //cout<<"X"<<j+1<<" coordinate = "<<x<<endl;
             if(m[i][j] != 0){
-                square(x,y,lsize,true,light_blue);
+                square(x,y,lsize,true,color);
             }
 
             x+=lsize;
@@ -144,17 +94,27 @@ void draw_shape(int m[3][3], int x, int y, int lsize){
         y += lsize;
     }
 }
+void rotate90Clockwise(int a[N][N]) //functie pentru a roti piesa selectata
+{
 
-void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int gap){
+    for (int i = 0; i < N / 2; i++) {
+        for (int j = i; j < N - i - 1; j++) {
+            int aux = a[i][j];
+            a[i][j] = a[N - 1 - j][i];
+            a[N - 1 - j][i] = a[N - 1 - i][N - 1 - j];
+            a[N - 1 - i][N - 1 - j] = a[j][N - 1 - i];
+            a[j][N - 1 - i] = aux;
+        }
+    }
+}
+
+void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int color1[3], int color2[3], int nrPiesa){
     //c_x++; c_y++;
     //c_size -= 2;
-    int shape_length = (c_size - gap)/2;
+    square( c_x, c_y, c_size/2-1, true, color1);
+    int shape_length = (c_size)/2;
     int shape_size = shape_length / 3;
-    draw_shape(matrix[0],c_x,c_y,shape_size);
-    draw_shape(matrix[1],(c_x + gap + shape_length),c_y,shape_size);
-    draw_shape(matrix[2],c_x,(c_y + gap + shape_length),shape_size);
-    draw_shape(matrix[3],(c_x + gap + shape_length),(c_y + gap + shape_length),shape_size);
-
+    draw_shape(matrix[nrPiesa],c_x,c_y,shape_size, color2);
 }
 
 bool in_border(int mX, int mY, int x, int y, int x1, int y1){
@@ -179,10 +139,8 @@ void menu(){ //plaseaza fundalul si textul ferestrei de meniu
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
 
     //start
-
     bar(575, 320, 829, 392);
     outtextxy(702-textwidth("START")/2, 356-textheight("S")/2, "START");
-
 
     //settings
     bar(575, 320+120, 829, 392+120);
@@ -201,6 +159,7 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
 
+
     //how to play
 
     bar(534, 257, 865, 311);
@@ -208,7 +167,6 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
 
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     //starter
-
     bar(535, 372, 866, 427);
     outtextxy(700-textwidth("STARTER")/2, 400-textheight("S")/2, "STARTER");
 
@@ -233,12 +191,12 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
 
-/*void playMusic(bool music){
+void playMusic(bool music){
   if (music==true)
     PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
     PlaySound(NULL, 0, 0);
-}*/
+}
 
 void settings(){ //plaseaza fundalul si textul ferestrei setari
     readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
@@ -294,7 +252,7 @@ void board(){
 
     //The board:
     //bar( (screenWidth/4 - 243), (screenHeight/2 - 243), (screenWidth/4 + 242), (screenHeight/2 + 242) );
-    readimagefile("img2.jpg",(screenWidth/4 - 243) ,(screenHeight/2 - 243),(screenWidth/4 + 242),(screenHeight/2 + 242));
+    readimagefile("starter.jpg",0,0,screenWidth,screenHeight);
 
     //Sector 1 coordinates: (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13)
 
@@ -307,8 +265,19 @@ void board(){
 
     //The shapes:
     setfillstyle(SOLID_FILL, COLOR(0, 105, 148)); //sea_blue
-    bar( (3*screenWidth/4 - 243), (screenHeight/2 - 243), (3*screenWidth/4 + 242), (screenHeight/2 + 242) );
-    shape_container(shapes, (3*screenWidth/4 - 243), (screenHeight/2 - 243), 485, 25);
+
+    shape_container(shapes, 101, 79, 400, blue_2, light_blue, 0);
+    matrix_coord[0].x=101; matrix_coord[0].y=79;
+
+    shape_container(shapes, 101, 377, 400, blue_2, light_blue, 1);
+    matrix_coord[1].x=101; matrix_coord[1].y=377;
+
+    shape_container(shapes, 1085, 79, 400, blue_2, light_blue, 2);
+    matrix_coord[2].x=1085; matrix_coord[2].y=79;
+
+    shape_container(shapes, 1085, 377, 400, blue_2, light_blue, 3);
+    matrix_coord[3].x=1085; matrix_coord[3].y=377;
+
 
     //Shape 1 coordinates: (3*screenWidth/4 - 243) , (screenHeight/2 - 243), (3*screenWidth/4 - 13), (screenHeight/2 - 13)
 
@@ -322,10 +291,24 @@ void board(){
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-    bar(307, 609, 452, 664);
-    outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
-    bar(970, 609, 1145, 664);
-    outtextxy(975, 615, "RETRY");
+    bar(333, 609, 478, 664);
+    outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+
+    //Retry button
+    bar(920, 609, 1075, 664);
+    outtextxy(997-textwidth("RETRY")/2, 636-textheight("R")/2, "RETRY");
+
+    //Hint button
+    bar(628, 590, 773, 645);
+    outtextxy(700-textwidth("HINT")/2, 618-textheight("H")/2, "HINT");
+
+    //Rotate button
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    bar(320, 167, 482, 222);
+    outtextxy(402-textwidth("ROTATE")/2, 196-textheight("R")/2, "ROTATE");
+
 }
 
 void retry_level(){
@@ -337,7 +320,6 @@ void retry_level(){
             selected_matrix[i][j] = 0;
         }
     }
-    refresh_board(4,0);
     board();
 }
 
@@ -354,14 +336,9 @@ void close_level(){
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
     bool draw = true; //pentru HOW TO
-    refresh_board(4,0);
     while(gameOpen){
 
-
-       // primul meniu pressed=0
-
         getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
-        //PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME); va fi mutat intr o functie ce va fi apelata in setari
        // Folosim variabilele 'in_menu', 'in_levels', 'gameStarted' in loc de variabila pressed pentru lucru mai usor cu
        // programul si o structura mai simpla
 
@@ -391,7 +368,6 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             if(in_border(mouseX,mouseY,535, 372, 866, 427)){//nivelul starter
                 clearmouseclick(WM_LBUTTONDOWN);
                 gameStarted = true; in_levels = false;
-                read_shapes();
                 board();
             }
             if(in_border(mouseX,mouseY,534, 257, 865, 311)){
@@ -403,64 +379,86 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
         }
         if(gameStarted){
 
+            int nr;
 
-                        //selectarea figurilor
-            if(in_border(mouseX,mouseY, (3*screenWidth/4 - 243) , (screenHeight/2 - 243), (3*screenWidth/4 - 13), (screenHeight/2 - 13)) && available[0]){
+            //selectarea figurilor
+            if(in_border(mouseX,mouseY, 101, 79, 304, 332) && available[0]){
+                nr=0;
                 copy_matrix(selected_matrix , shapes[0]);
-                square((3*screenWidth/4 - 243) , (screenHeight/2 - 243),230,true,blue_1); is_selected = true;
+                shape_container(shapes, 101, 79, 400, blue_2, blue_1, 0);
+                is_selected = true;
                 available[0] = 0;
             }
-            if(in_border(mouseX,mouseY, (3*screenWidth/4 + 12) , (screenHeight/2 - 243), (3*screenWidth/4 + 242), (screenHeight/2 - 13)) && available[1]){
+            if(in_border(mouseX,mouseY, 101, 377, 304, 630) && available[1]){
+                nr=1;
                 copy_matrix(selected_matrix , shapes[1]);
-                square((3*screenWidth/4 + 12) , (screenHeight/2 - 243),230,true,blue_1); is_selected = true;
+                shape_container(shapes, 101, 377, 400, blue_2, blue_1, 1);
+                is_selected = true;
                 available[1] = 0;
             }
-            if(in_border(mouseX,mouseY, (3*screenWidth/4 - 243) , (screenHeight/2 + 12), (3*screenWidth/4 - 13), (screenHeight/2 + 242)) && available[2]){
+            if(in_border(mouseX,mouseY, 1085, 79, 1338, 332) && available[2]){
+                nr=2;
                 copy_matrix(selected_matrix , shapes[2]);
-                square((3*screenWidth/4 - 243) , (screenHeight/2 + 12),230,true,blue_1); is_selected = true;
+                shape_container(shapes, 1085, 79, 400, blue_2, blue_1, 2);
+                is_selected = true;
                 available[2] = 0;
             }
-            if(in_border(mouseX,mouseY, (3*screenWidth/4 + 12) , (screenHeight/2 + 12), (3*screenWidth/4 + 242), (screenHeight/2 + 242)) && available[3]){
+            if(in_border(mouseX,mouseY, 1085, 377, 1338, 630) && available[3]){
+                nr=3;
                 copy_matrix(selected_matrix , shapes[3]);
-                square((3*screenWidth/4 + 12) , (screenHeight/2 + 12),230,true,blue_1); is_selected = true;
+                shape_container(shapes, 1085, 377, 400, blue_2, blue_1, 3);
+                is_selected = true;
                 available[3] = 0;
             }
 
 
-                        //plasarea figurilor
-            if (!placed[0] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 - 243), (screenWidth/4 - 13) ,(screenHeight/2 - 13))){
-                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 - 243),230/3); is_selected = false; placed[0] = 1;
-                hide_matrix(board_matrix[0],selected_matrix);
+            //plasarea figurilor
+            if (is_selected && in_border(mouseX,mouseY, 533, 200, 691, 368)){
+                square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                draw_shape(selected_matrix, 533, 200, 158/3, blue_1);
+                is_selected = false;
             }
 
-            if (!placed[1] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 - 243), (screenWidth/4 + 242) ,(screenHeight/2 - 13))){
-                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 - 243),230/3); is_selected = false; placed[1] = 1;
-                hide_matrix(board_matrix[1],selected_matrix);
+            if (is_selected && in_border(mouseX,mouseY, 533, 372, 691, 545)){
+                square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                draw_shape(selected_matrix, 533, 372, 158/3, blue_1);
+                is_selected = false;
             }
 
-            if (!placed[2] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 - 243) ,(screenHeight/2 + 12), (screenWidth/4 - 13) ,(screenHeight/2 + 242))){
-                draw_shape(selected_matrix,(screenWidth/4 - 243) ,(screenHeight/2 + 12),230/3); is_selected = false; placed[2] = 1;
-                hide_matrix(board_matrix[2],selected_matrix);
+            if (is_selected && in_border(mouseX,mouseY, 710, 200, 869, 368)){
+                square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                draw_shape(selected_matrix, 710, 200, 158/3, blue_1);
+                is_selected = false;
             }
 
-            if (!placed[3] && is_selected && in_border(mouseX,mouseY, (screenWidth/4 + 12) ,(screenHeight/2 + 12), (screenWidth/4 + 242) ,(screenHeight/2 + 242))){
-                draw_shape(selected_matrix,(screenWidth/4 + 12) ,(screenHeight/2 + 12),230/3); is_selected = false; placed[3] = 1;
-                hide_matrix(board_matrix[3],selected_matrix);
+            if (is_selected && in_border(mouseX,mouseY, 710, 372, 869, 545)){
+                square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                draw_shape(selected_matrix, 710, 372, 158/3, blue_1);
+                is_selected = false;
             }
 
-
-                        //Retry
+            //Retry
 
             if(in_border(mouseX, mouseY, 970, 609, 1145, 664)){
                 clearmouseclick(WM_LBUTTONDOWN);
                 retry_level();
             }
 
-                        //Back
+            //Back
             if (in_border(mouseX, mouseY, 307, 609, 452, 664)){
                 in_levels = true; gameStarted = false;
                 close_level();
                 levels();
+            }
+
+            //Rotate
+            if (in_border(mouseX, mouseY, 320, 167, 482, 222)){
+                rotate90Clockwise(shapes[nr]);
+                copy_matrix(selected_matrix , shapes[nr]);
+                shape_container(shapes, matrix_coord[nr].x, matrix_coord[nr].y, 400, blue_2, blue_1, nr);
+                is_selected = true;
+                available[nr] = 0;
+
             }
         }
 
@@ -470,7 +468,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 if (music==true)
                 {
                     music=false;
-                    //playMusic(music);
+                    playMusic(music);
                     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
@@ -480,7 +478,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 else
                 {
                     music=true;
-                    //playMusic(music);
+                    playMusic(music);
                     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
@@ -515,6 +513,8 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
 
         }
+
+
     }
     return gameOpen;
 }
@@ -527,14 +527,5 @@ int main(){
     startGame();
 
     closegraph();
-    for(int k=0;k<4;k++){
-        cout<<"Square "<<k<<":"<<endl;
-        for(int i=0;i<3;i++){
-            for(int j=0; j<3; j++){
-                cout<<board_matrix[k][i][j]<<" ";
-            }
-            cout<<endl;
-        }
-    }
     return 0;
 }
