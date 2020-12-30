@@ -4,3 +4,12 @@
 	<graphics.h>
 	<winbgim.h>
 
+1609283009 source:c:\users\pc\documents\github\pirateshidenseek\main.cpp
+	<iostream>
+	<graphics.h>
+	<winbgim.h>
+	<windows.h>
+	<mmsystem.h>
+	<fstream>
+	<ctime>
+
