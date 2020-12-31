@@ -1,0 +1,10 @@
+Legenda:
+0 - nimic
+2 - pirat
+3 - nava naufragiata
+4 - nava
+5 - comoara
+6 - tentacule
+7 - turn
+8 - corabie pirati
+9 - insula

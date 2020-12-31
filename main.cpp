@@ -44,13 +44,45 @@ struct coordonatePiese {
     int x, y;
 }matrix_coord[4];
 
-//Auxiliar plan vechi
+//Auxiliar generare
+int challenge[16] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 int board_matrix[4][3][3];
 
-void refresh_board(int squares, int first_poz){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
+void rotate90Clockwise(int a[N][N]) //functie pentru a roti piesa selectata
+{
+
+    for (int i = 0; i < N / 2; i++) {
+        for (int j = i; j < N - i - 1; j++) {
+            int aux = a[i][j];
+            a[i][j] = a[N - 1 - j][i];
+            a[N - 1 - j][i] = a[N - 1 - i][N - 1 - j];
+            a[N - 1 - i][N - 1 - j] = a[j][N - 1 - i];
+            a[j][N - 1 - i] = aux;
+        }
+    }
+}
+
+
+void refresh_board(int squares, int first_poz, int selected_level){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
                                                 //                                        first_poz - de la care patrat incepem citirea
     ifstream fi; string aux;
-    fi.open("board_matrix.in", ios::in);
+    if (selected_level == 1){
+        fi.open("starter_board.in", ios::in);
+    }
+    /*if (level == 2){
+        fi.open("junior_board.in", ios::in);
+    }
+    if (level == 3){
+        fi.open("expert_board.in", ios::in);
+    }
+    if (level == 4){
+        fi.open("master_board.in", ios::in);
+    }*/
+    else{
+        cout<<"Error: No suck level!"<<endl;
+        return;
+    }
+
     int k = 0;
     if(first_poz+squares > 4){
         cout<<"Error, square out of range!"<<endl;
@@ -79,7 +111,7 @@ void read_shapes(){
     srand(time(0));
     int na[4] = {-1,-1,-1,-1}, rng, k = 0;
     while(k < 4){
-        rng = rand() % 10;
+        rng = rand() % 13;
         if(rng != na[0] && rng != na[1] && rng != na[2] && rng != na[3]){
             //cout<<"The line is: "<<rng+1<<endl;
             for(int f = 0; f < rng; f++){
@@ -103,7 +135,6 @@ void read_shapes(){
 }
 //End
 
-
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
@@ -113,6 +144,125 @@ void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
         }
     }
 }
+
+//Challenge generator
+void generate_challenge(){
+    int used_numbers[4] = {-1,-1,-1,-1};
+    int k = 0, aux;
+    bool new_num = false;
+    srand(time(0));
+    while (k < 4){
+        while(!new_num){
+
+            new_num = true;
+            aux = rand() % 4;
+            //cout<<"Chose number "<<aux<<endl<<"Checking number:"<<endl;
+            for(int i = 0; i < 4; i++){
+                //cout<<used_numbers[i]<<" ";
+                if(used_numbers[i] == aux) new_num = false;
+            }
+            //cout<<endl;
+            if(new_num){
+                used_numbers[k] = aux;
+            }
+        }
+        new_num = false;
+        /*cout<<"Placed shape "<<aux<<" on square "<<k<<endl;
+        cout<<"The shape: "<<endl;
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                cout<<shapes[aux][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<"Square before: "<<endl;
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                cout<<board_matrix[k][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<"~~~~~~~~~~~~~~~~~~~"<<endl;*/
+        hide_matrix(board_matrix[k], shapes[aux]);
+        /*cout<<"Result: "<<endl;
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                cout<<board_matrix[k][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<endl<<"Next number ------------"<<endl;*/
+        k++;
+    }
+    aux = 0;
+    for(int k = 0; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(board_matrix[k][i][j] != 0){
+                    challenge[aux] = board_matrix[k][i][j];
+                    aux++;
+                }
+            }
+        }
+    }
+    refresh_board(4,0,1);
+
+}
+
+void print_challange(){
+    int i = 0;
+    while(challenge[i] != -1 && i < 16){
+        cout<<challenge[i]<<" ";
+        i++;
+    }
+    /*cout<<endl<<"Shapes: "<<endl;
+    for(int k = 0; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                cout<<shapes[k][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<endl;
+    }*/
+
+}
+
+void display_challange(int startX, int startY){ //deafult shall be x = 360 y = 45 size: 600 X 90
+
+    setfillstyle(SOLID_FILL, COLOR(252, 243, 134));
+    bar(startX, startY, startX + 610, startY + 90);
+    int i = 0;
+    while(i < 16 && challenge[i] != -1){
+            cout<<"Cheking element "<<i<<" = "<<challenge[i]<<endl;
+            if(challenge[i] == 2){
+                readimagefile("pirate.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 3){
+                readimagefile("ship_wrecked.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 4){
+                readimagefile("ship.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 5){
+                readimagefile("treasure.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 6){
+                readimagefile("tentacles.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 7){
+                readimagefile("tower.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 8){
+                readimagefile("ship_pirate.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+            if(challenge[i] == 9){
+                readimagefile("island.jpg",startX+76*i, startY + 7, (startX+76*i)+76, (startY + 7) + 76);
+            }
+        i++;
+    }
+}
+//End
 
 void square(int x, int y, int size, bool fillshape,int color[3]){ //deseneaza un patrat cu coordonatele coltului stang sus (x,y), latura de marime size si culoarea rgb color,
                                                                   //daca fillshape e true se umple interiorul patratului cu culoarea selectata
@@ -154,19 +304,7 @@ void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){
         y += lsize;
     }
 }
-void rotate90Clockwise(int a[N][N]) //functie pentru a roti piesa selectata
-{
 
-    for (int i = 0; i < N / 2; i++) {
-        for (int j = i; j < N - i - 1; j++) {
-            int aux = a[i][j];
-            a[i][j] = a[N - 1 - j][i];
-            a[N - 1 - j][i] = a[N - 1 - i][N - 1 - j];
-            a[N - 1 - i][N - 1 - j] = a[j][N - 1 - i];
-            a[j][N - 1 - i] = aux;
-        }
-    }
-}
 
 void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int color1[3], int color2[3], int nrPiesa){
     //c_x++; c_y++;
@@ -251,12 +389,12 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
 }
 
-void playMusic(bool music){
+/*void playMusic(bool music){
   if (music==true)
     PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
     PlaySound(NULL, 0, 0);
-}
+}*/
 
 void settings(){ //plaseaza fundalul si textul ferestrei setari
     readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
@@ -306,7 +444,7 @@ void howto(int step)
 }
 
 void board(){
-    readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
+    readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight); //menu_background
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
 
@@ -428,7 +566,12 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             if(in_border(mouseX,mouseY,535, 372, 866, 427)){//nivelul starter
                 clearmouseclick(WM_LBUTTONDOWN);
                 gameStarted = true; in_levels = false;
+                read_shapes();
+                refresh_board(4,0,1);
+                generate_challenge();
+                print_challange();
                 board();
+                display_challange(360,42);
             }
             if(in_border(mouseX,mouseY,534, 257, 865, 311)){
                 clearmouseclick(WM_LBUTTONDOWN);
@@ -525,7 +668,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
         if(in_settings){
             if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395){ //music on/off
                 clearmouseclick(WM_LBUTTONDOWN);
-                if (music==true)
+                /*if (music==true)
                 {
                     music=false;
                     playMusic(music);
@@ -544,7 +687,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     setbkcolor(COLOR(139, 194, 234));
                     bar(853, 340, 936, 395);
                     outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
-                }
+                }*/
             }
             if(in_border(mouseX,mouseY,307, 609, 452, 664)){
                 clearmouseclick(WM_LBUTTONDOWN);
