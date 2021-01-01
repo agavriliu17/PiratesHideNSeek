@@ -36,6 +36,7 @@ bool in_tutorial = false;
 int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
 bool is_selected = false;
 bool available[4] = {1,1,1,1};
+bool placed[4] = {0,0,0,0};
 int shapes[4][3][3] =  {1,1,1,1,1,1,0,1,0,
                         1,1,1,1,0,1,0,1,1,
                         0,1,1,1,1,1,1,1,1,
@@ -518,7 +519,13 @@ void retry_level(){
             selected_matrix[i][j] = 0;
         }
     }
+    refresh_board(4,0,1);
+    placed[0] = false;
+    placed[1] = false;
+    placed[2] = false;
+    placed[3] = false;
     board();
+    display_challange(360,42);
 }
 
 void close_level(){
@@ -530,6 +537,93 @@ void close_level(){
             selected_matrix[i][j] = 0;
         }
     }
+    placed[0] = false;
+    placed[1] = false;
+    placed[2] = false;
+    placed[3] = false;
+}
+
+bool all_placed(){
+    for(int i = 0; i<4; i++){
+        if(placed[i] == false) return false;
+    }
+    placed[0] = 0;
+    return true;
+}
+
+bool check_solution(){
+    /*cout<<"Board Matrix result: "<<endl;
+    for(int k = 0; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                cout<<board_matrix[k][i][j]<<" ";
+            }
+            cout<<endl;
+        }
+        cout<<"----------"<<endl;
+    }*/
+    int challenge_count[8] = {0,0,0,0,0,0,0,0}, board_count[8] = {0,0,0,0,0,0,0,0}; //0 - pirate, 1 - ship wreck, 2 - ship, 3 - treasure, 4 - tentacles
+                                            //5 - tower, 6 - ship pirates, 7 - island
+    for(int i = 0; i < 16 ; i++){
+        if(challenge[i] == 2){
+            challenge_count[0]++;
+        }
+        if(challenge[i] == 3){
+            challenge_count[1]++;
+        }
+        if(challenge[i] == 4){
+            challenge_count[2]++;
+        }
+        if(challenge[i] == 5){
+            challenge_count[3]++;
+        }
+        if(challenge[i] == 6){
+            challenge_count[4]++;
+        }
+        if(challenge[i] == 7){
+            challenge_count[5]++;
+        }
+        if(challenge[i] == 8){
+            challenge_count[6]++;
+        }
+        if(challenge[i] == 9){
+            challenge_count[7]++;
+        }
+    }
+    for(int k = 0; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(board_matrix[k][i][j] == 2){
+                    board_count[0]++;
+                }
+                if(board_matrix[k][i][j] == 3){
+                    board_count[1]++;
+                }
+                if(board_matrix[k][i][j] == 4){
+                    board_count[2]++;
+                }
+                if(board_matrix[k][i][j] == 5){
+                    board_count[3]++;
+                }
+                if(board_matrix[k][i][j] == 6){
+                    board_count[4]++;
+                }
+                if(board_matrix[k][i][j] == 7){
+                    board_count[5]++;
+                }
+                if(board_matrix[k][i][j] == 8){
+                    board_count[6]++;
+                }
+                if(board_matrix[k][i][j] == 9){
+                    board_count[7]++;
+                }
+            }
+        }
+    }
+    for(int i = 0; i < 8; i++){
+        if(challenge_count[i] != board_count[i]) return false;
+    }
+    return true;
 }
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
@@ -616,27 +710,35 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 
 
             //plasarea figurilor
-            if (is_selected && in_border(mouseX,mouseY, 533, 200, 691, 368)){
+            if (is_selected && in_border(mouseX,mouseY, 533, 200, 691, 368)&& !placed[0]){
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                placed[0] = true;
                 draw_shape(selected_matrix, 533, 200, 158/3, blue_1);
+                hide_matrix(board_matrix[0], selected_matrix);
                 is_selected = false;
             }
 
-            if (is_selected && in_border(mouseX,mouseY, 533, 372, 691, 545)){
+            if (is_selected && in_border(mouseX,mouseY, 533, 372, 691, 545) && !placed[2]){
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                placed[2] = true;
                 draw_shape(selected_matrix, 533, 372, 158/3, blue_1);
+                hide_matrix(board_matrix[2], selected_matrix);
                 is_selected = false;
             }
 
-            if (is_selected && in_border(mouseX,mouseY, 710, 200, 869, 368)){
+            if (is_selected && in_border(mouseX,mouseY, 710, 200, 869, 368) && !placed[1]){
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                placed[1] = true;
                 draw_shape(selected_matrix, 710, 200, 158/3, blue_1);
+                hide_matrix(board_matrix[1], selected_matrix);
                 is_selected = false;
             }
 
-            if (is_selected && in_border(mouseX,mouseY, 710, 372, 869, 545)){
+            if (is_selected && in_border(mouseX,mouseY, 710, 372, 869, 545) && !placed[3]){
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
+                placed[3] = true;
                 draw_shape(selected_matrix, 710, 372, 158/3, blue_1);
+                hide_matrix(board_matrix[3], selected_matrix);
                 is_selected = false;
             }
 
@@ -662,6 +764,15 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 is_selected = true;
                 available[nr] = 0;
 
+            }
+
+            if(all_placed()){
+                if(check_solution()){
+                    cout<<"BIG YES"<<endl;
+                }
+                else{
+                    cout<<"Mission Failed, we are getting them next time!"<<endl;
+                }
             }
         }
 
@@ -725,6 +836,10 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 int main(){
 
     initwindow(screenWidth,screenHeight);
+    placed[0] = false;
+    placed[1] = false;
+    placed[2] = false;
+    placed[3] = false;
     menu();
     //playMusic(music);
     startGame();
