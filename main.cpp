@@ -32,6 +32,9 @@ bool gameStarted = false; //variabila ce verifica daca s-a inceput jocul
 bool in_settings = false; //variabila ce verifica daca suntem in setari
 bool in_tutorial = false;
 bool playingStarter = false, playingJunior = false, playingExpert = false, playingMaster = false, playingGenerated = false; //variabile ce verifica nivelul selectat
+bool in_english = true;
+bool win_screen = false;
+bool lose_screen = false;
 
 
 //variabile pentru logica matricelor
@@ -245,12 +248,24 @@ void menu(){ //plaseaza fundalul si textul ferestrei de meniu
 
     //settings
     bar(575, 320+120, 829, 392+120);
-    outtextxy(702-textwidth("SETTINGS")/2, 476-textheight("S")/2, "SETTINGS");
+    if(in_english){
+        outtextxy(702-textwidth("SETTINGS")/2, 476-textheight("S")/2, "SETTINGS");
+    }
+    else{
+        outtextxy(702-textwidth("SETARI")/2, 476-textheight("S")/2, "SETARI");
+    }
+
 
     //exit
 
     bar(575, 320+240, 829, 392+240);
-    outtextxy(702-textwidth("EXIT")/2, 596-textheight("E")/2, "EXIT");
+    if(in_english){
+        outtextxy(702-textwidth("EXIT")/2, 596-textheight("E")/2, "EXIT");
+    }
+    else{
+        outtextxy(702-textwidth("IESIRE")/2, 596-textheight("I")/2, "IESIRE");
+    }
+
 
 }
 
@@ -264,7 +279,13 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     //how to play
 
     bar(534, 257, 865, 311);
-    outtextxy(700-textwidth("HOW TO PLAY")/2, 284-textheight("H")/2, "HOW TO PLAY");
+    if(in_english){
+        outtextxy(700-textwidth("HOW TO PLAY")/2, 284-textheight("H")/2, "HOW TO PLAY");
+    }
+    else{
+        outtextxy(700-textwidth("CUM JOCAM")/2, 284-textheight("C")/2, "CUM JUCAM");
+    }
+
 
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     //starter
@@ -289,12 +310,21 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     //back to menu
 
     bar(307, 609, 452, 664);
-    outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
-
+    if(in_english){
+        outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+        outtextxy(379-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+    }
     //generated level
     settextstyle(BOLD_FONT, HORIZ_DIR, 3);
     bar(949, 609, 1140, 664);
-    outtextxy(1044-textwidth("GENERATED")/2, 636-textheight("G")/2, "GENERATED");
+    if(in_english){
+        outtextxy(1044-textwidth("GENERATED")/2, 636-textheight("G")/2, "GENERATED");
+    }
+    else{
+        outtextxy(1044-textwidth("GENERAT")/2, 636-textheight("G")/2, "GENERAT");
+    }
 }
 
 /*void playMusic(bool music){
@@ -312,15 +342,32 @@ void settings(){ //plaseaza fundalul si textul ferestrei setari
 
     //music
     bar(452, 340, 614, 395);
-    outtextxy(533-textwidth("MUSIC")/2, 367-textheight("M")/2, "MUSIC");
+    if(in_english){
+        outtextxy(533-textwidth("MUSIC")/2, 367-textheight("M")/2, "MUSIC");
+    }
+    else{
+        outtextxy(533-textwidth("MUZICA")/2, 367-textheight("M")/2, "MUZICA");
+    }
     bar(853, 340, 936, 395);
-    outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+    if(in_english){
+        outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+    }
+    else{
+        outtextxy(895-textwidth("DA")/2, 367-textheight("D")/2, "DA");
+    }
+
 
 
     //language
     settextstyle(BOLD_FONT, HORIZ_DIR, 4);
     bar(453, 442, 614, 497);
-    outtextxy(534-textwidth("LANGUAGE")/2, 470-textheight("L")/2, "LANGUAGE");
+    if(in_english){
+        outtextxy(534-textwidth("LANGUAGE")/2, 470-textheight("L")/2, "LANGUAGE");
+    }
+    else{
+        outtextxy(534-textwidth("LANGUAGE")/2, 470-textheight("L")/2, "LANGUAGE");
+    }
+
     bar(853, 446, 936, 501);
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     outtextxy(895-textwidth("EN")/2, 474-textheight("E")/2, "EN");
@@ -328,27 +375,54 @@ void settings(){ //plaseaza fundalul si textul ferestrei setari
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
     bar(307, 609, 452, 664);
-    outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    if(in_english){
+        outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+        outtextxy(379-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+    }
+
 }
 
 void howto(int step)
 {
-    if(step==1)
-        readimagefile("howto1.jpg",0,0,screenWidth,screenHeight);
-    else
-        if (step==2)
-        readimagefile("howto2.jpg",0,0,screenWidth,screenHeight);
-            else
-                readimagefile("howto3.jpg",0,0,screenWidth,screenHeight);
+    if(in_english){
+       if(step==1)
+            readimagefile("english/howto1.jpg",0,0,screenWidth,screenHeight);
+        else
+            if (step==2)
+            readimagefile("english/howto2.jpg",0,0,screenWidth,screenHeight);
+                else
+                    readimagefile("english/howto3.jpg",0,0,screenWidth,screenHeight);
 
-    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
-    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-    bar(628, 590, 773, 645);
-    if(step<3)
-        outtextxy(700-textwidth("NEXT")/2, 618-textheight("N")/2, "NEXT");
-    else
-        outtextxy(700-textwidth("OK")/2, 618-textheight("O")/2, "OK");
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(628, 590, 773, 645);
+        if(step<3)
+            outtextxy(700-textwidth("NEXT")/2, 618-textheight("N")/2, "NEXT");
+        else
+            outtextxy(700-textwidth("OK")/2, 618-textheight("O")/2, "OK");
+    }
+    else{
+       if(step==1)
+            readimagefile("romanian/howto1.jpg",0,0,screenWidth,screenHeight);
+        else
+            if (step==2)
+            readimagefile("romanian/howto2.jpg",0,0,screenWidth,screenHeight);
+                else
+                    readimagefile("romanian/howto3.jpg",0,0,screenWidth,screenHeight);
+
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(628, 590, 773, 645);
+        if(step<3)
+            outtextxy(700-textwidth("URMATOR")/2, 618-textheight("U")/2, "URMATOR");
+        else
+            outtextxy(700-textwidth("OK")/2, 618-textheight("O")/2, "OK");
+    }
+
 }
 
 void board(){
@@ -390,15 +464,33 @@ void board(){
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
     bar(333, 609, 478, 664);
-    outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    if(in_english){
+        outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+        outtextxy(405-textwidth("INAPOI")/2, 636-textheight("B")/2, "INAPOI");
+    }
+
 
     //Hint button
     bar(920, 609, 1075, 664);
-    outtextxy(997-textwidth("HINT")/2, 636-textheight("H")/2, "HINT");
+    if(in_english){
+        outtextxy(997-textwidth("HINT")/2, 636-textheight("H")/2, "HINT");
+    }
+    else{
+        outtextxy(997-textwidth("INDICIU")/2, 636-textheight("I")/2, "INDICIU");
+    }
+
 
     //Rotate button
     bar(610, 590, 791, 645);
-    outtextxy(700-textwidth("ROTATE")/2, 618-textheight("R")/2, "ROTATE");
+    if(in_english){
+        outtextxy(700-textwidth("ROTATE")/2, 618-textheight("R")/2, "ROTATE");
+    }
+    else{
+        outtextxy(700-textwidth("ROTESTE")/2, 618-textheight("R")/2, "ROTESTE");
+    }
+
 }
 
 void close_level(){
@@ -667,8 +759,56 @@ void refresh_challenge(){
     }
 }
 
-void get_challenge(string level){
-    //citim challenge-ul din fisier
+void won(){
+    //cout<<"Entered function!"<<endl;
+    if(in_english){
+        //cout<<"Got english!"<<endl;
+        readimagefile("aux_img/won_en.jpg",0,0,screenWidth,screenHeight);
+
+        //back
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(333, 609, 478, 664);
+        outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+        //cout<<"Got romanian!"<<endl;
+        readimagefile("aux_img/won_ro.jpg",0,0,screenWidth,screenHeight);
+
+        //back
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(333, 609, 478, 664);
+        outtextxy(405-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+    }
+}
+
+void lost(){
+
+    if(in_english){
+
+        readimagefile("aux_img/lost_en.jpg",0,0,screenWidth,screenHeight);
+
+        //back
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(333, 609, 478, 664);
+        outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+
+        readimagefile("aux_img/lost_ro.jpg",0,0,screenWidth,screenHeight);
+
+        //back
+        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        bar(333, 609, 478, 664);
+        outtextxy(405-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+    }
 }
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
@@ -965,16 +1105,26 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     available[nr] = 0;
                 }
             }
-            else{
+            else{ //Done
                 if (in_border(mouseX, mouseY, 628, 590, 773, 645)){
                     if(check_solution()){
                         cout<<"You Won!";
+                        won(); win_screen = true;
                     }
                     else{
                         cout<<"You lost!";
+                        lost(); lose_screen = true;
                     }
-                    close_level();
-                    levels();
+                    //close_level();
+                    //levels();
+                }
+            }
+
+            //Win / Lose
+            if(win_screen || lose_screen){ //Back
+                if(in_border(mouseX, mouseY, 307, 609, 452, 664)){
+                    close_level(); levels();
+                    win_screen = false;
                 }
             }
 
@@ -1047,6 +1197,25 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 clearmouseclick(WM_LBUTTONDOWN);
                 in_settings = false; in_menu = true;
                 menu();
+            }
+            if(in_border(mouseX,mouseY, 853, 446, 936, 501)){
+                setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
+                settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                setbkcolor(COLOR(139, 194, 234));
+
+                if(in_english) in_english = false;
+                else in_english = true;
+
+                if(in_english){
+                    bar(853, 446, 936, 501);
+                    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                    outtextxy(895-textwidth("EN")/2, 474-textheight("E")/2, "EN");
+                }
+                else{
+                    bar(853, 446, 936, 501);
+                    settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+                    outtextxy(895-textwidth("RO")/2, 474-textheight("E")/2, "RO");
+                }
             }
         }
 
