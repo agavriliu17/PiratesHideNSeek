@@ -210,7 +210,6 @@ void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){
     }
 }
 
-
 void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int color1[3], int color2[3], int nrPiesa){
     //c_x++; c_y++;
     //c_size -= 2;
@@ -232,7 +231,6 @@ void copy_matrix(int m1[3][3], int m2[3][3]){//copie m2 in m1
         }
     }
 }
-
 
 
 void menu(){ //plaseaza fundalul si textul ferestrei de meniu
@@ -525,13 +523,16 @@ bool check_solution(){
 void generate_challenge(){
     int used_numbers[4] = {-1,-1,-1,-1};
     int k = 0, aux;
+    int aux_matrix[3][3];
     bool new_num = false;
+    bool rotate_shape = false;
+    int rotate_times = 0;
     srand(time(0));
     while (k < 4){
         while(!new_num){
 
             new_num = true;
-            aux = rand() % 4;
+            aux = rand() % 4; rotate_shape = rand() % 2; rotate_times = rand() % 6;
             cout<<"Chose number "<<aux<<endl<<"Checking number:"<<endl;
             for(int i = 0; i < 4; i++){
                 cout<<used_numbers[i]<<" ";
@@ -544,10 +545,11 @@ void generate_challenge(){
         }
         new_num = false;
         cout<<"Placed shape "<<aux<<" on square "<<k<<endl;
+        copy_matrix(aux_matrix,shapes[aux]);
         cout<<"The shape: "<<endl;
         for(int i = 0; i < 3; i++){
             for(int j = 0; j < 3; j++){
-                cout<<shapes[aux][i][j]<<" ";
+                cout<<aux_matrix[i][j]<<" ";
             }
             cout<<endl;
         }
@@ -558,8 +560,20 @@ void generate_challenge(){
             }
             cout<<endl;
         }
+
+
+
+        if(rotate_shape){
+            cout<<"Rotated "<<rotate_times<<":"<<endl;
+            for(int l = 0; l < rotate_times; l++){
+                rotate90Clockwise(aux_matrix);
+            }
+        }
+        else{
+            cout<<"No rotation"<<endl;
+        }
         cout<<"~~~~~~~~~~~~~~~~~~~"<<endl;
-        hide_matrix(board_matrix[k], shapes[aux]);
+        hide_matrix(board_matrix[k], aux_matrix);
         cout<<"Result: "<<endl;
         for(int i = 0; i < 3; i++){
             for(int j = 0; j < 3; j++){
