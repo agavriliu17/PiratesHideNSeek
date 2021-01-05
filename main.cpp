@@ -44,17 +44,14 @@ int selected_matrix[3][3] = {0,0,0,0,0,0,0,0,0};
 bool is_selected = false;
 bool available[4] = {1,1,1,1};
 bool placed_pieces[4] = {0,0,0,0};
-int shapes[4][3][3] =  {1,1,1,1,1,1,0,1,0,
-                        1,1,1,1,0,1,0,1,1,
-                        0,1,1,1,1,1,1,1,1,
-                        0,1,1,1,1,1,1,1,0};
+int shapes[4][3][3];
 struct coordonatePiese {
     int x, y;
 }matrix_coord[4];
 
 
 int challenge[16] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-int board_matrix[4][3][3]; string level_name;
+int board_matrix[4][3][3];
 int solution[4];
 int solution_rotation[4];
 
@@ -76,19 +73,19 @@ void refresh_board(int squares, int first_poz, int selected_level){ //citeste di
                                                 //                                        first_poz - de la care patrat incepem citirea
     ifstream fi; string aux;
     if (selected_level == 1){
-        fi.open("starter_board.in", ios::in);
+        fi.open("starter/board.in", ios::in);
     }
     else if (selected_level == 2){
-        fi.open("junior_board.in", ios::in);
+        fi.open("junior/board.in", ios::in);
     }
     else if (selected_level == 3){
-        fi.open("expert_board.in", ios::in);
+        fi.open("expert/board.in", ios::in);
     }
     else if (selected_level == 4){
-        fi.open("master_board.in", ios::in);
+        fi.open("master/board.in", ios::in);
     }
     else if (selected_level == 5){
-        fi.open("board_matrix.in", ios::in);
+        fi.open("generated/board.in", ios::in);
     }
     else{
         cout<<"Error: No suck level!"<<endl;
@@ -119,7 +116,7 @@ void refresh_board(int squares, int first_poz, int selected_level){ //citeste di
 void read_shapes(){
     ifstream fi;
     string aux;
-    fi.open("islands.in", ios::in);
+    fi.open("generated/shapes.in", ios::in);
     srand(time(0));
     int na[4] = {-1,-1,-1,-1}, rng, k = 0;
     while(k < 4){
@@ -146,24 +143,6 @@ void read_shapes(){
     fi.close();
 }
 //End
-void refresh_shapes(string level){
-    ifstream fi;
-    string filename;
-    filename = level + "_shapes.in";
-    if(level != "starter" && level != "junior" && level != "expert" && level != "master"){
-        cout<<"Wrong level name!  "<<filename<<endl;
-        return;
-    }
-    fi.open(filename, ios::in);
-    for(int k = 0; k < 4; k ++){
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j ++){
-                fi >> shapes[k][i][j];
-            }
-        }
-    }
-    fi.close();
-}
 
 void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
@@ -439,19 +418,19 @@ void board(){
 
     //selectarea imaginii challenge-ului ales
     if (playingStarter)
-    readimagefile("starter.jpg",0,0,screenWidth,screenHeight);
+    readimagefile("starter/starter.jpg",0,0,screenWidth,screenHeight);
     else
         if(playingJunior)
-        readimagefile("junior.jpg",0,0,screenWidth,screenHeight);
+        readimagefile("junior/junior.jpg",0,0,screenWidth,screenHeight);
         else
             if(playingExpert)
-            readimagefile("expert.jpg",0,0,screenWidth,screenHeight);
+            readimagefile("expert/expert.jpg",0,0,screenWidth,screenHeight);
                 else
                     if(playingMaster)
-                    readimagefile("master.jpg",0,0,screenWidth,screenHeight);
+                    readimagefile("master/master.jpg",0,0,screenWidth,screenHeight);
                         else
                             if(playingGenerated)
-                            readimagefile("generated.jpg",0,0,screenWidth,screenHeight);
+                            readimagefile("generated/generated.jpg",0,0,screenWidth,screenHeight);
     //The shapes:
     setfillstyle(SOLID_FILL, COLOR(0, 105, 148)); //sea_blue
 
@@ -704,7 +683,7 @@ void generate_challenge(){
 
 }
 
-void print_challange(){
+void print_challenge(){
     int i = 0;
     while(challenge[i] != -1 && i < 16){
         cout<<challenge[i]<<" ";
@@ -726,7 +705,7 @@ void print_challange(){
 
 }
 
-void display_challange(int startX, int startY){ //deafult shall be x = 300 y = 42 size: 600 X 90
+void display_challenge(int startX, int startY){ //deafult shall be x = 300 y = 42 size: 600 X 90
 
     setfillstyle(SOLID_FILL, COLOR(252, 243, 134));
     //bar(startX, startY, startX + 610, startY + 90);
@@ -738,28 +717,28 @@ void display_challange(int startX, int startY){ //deafult shall be x = 300 y = 4
                 k-=8;
             }
             if(challenge[i] == 2){
-                readimagefile("pirate.jpg",startX+76*k, (startY - 23)*aux, ((startX+76*k)+76), ((startY - 23)*aux + 76));
+                readimagefile("aux_img/pirate.jpg",startX+76*k, (startY - 23)*aux, ((startX+76*k)+76), ((startY - 23)*aux + 76));
             }
             if(challenge[i] == 3){
-                readimagefile("ship_wrecked.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/ship_wrecked.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 4){
-                readimagefile("ship.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/ship.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 5){
-                readimagefile("treasure.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/treasure.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 6){
-                readimagefile("tentacles.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/tentacles.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 7){
-                readimagefile("tower.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/tower.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 8){
-                readimagefile("ship_pirate.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/ship_pirate.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
             if(challenge[i] == 9){
-                readimagefile("island.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
+                readimagefile("aux_img/island.jpg",startX+76*k, (startY - 23)*aux, (startX+76*k)+76, (startY - 23)*aux + 76);
             }
         i++; k++;
     }
@@ -890,10 +869,36 @@ void give_hint(){
     }
 }
 
+void get_shapes(string filename){
+    fstream fi;
+    fi.open(filename,ios::in);
+    for(int k = 0 ; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                fi>>shapes[k][i][j];
+            }
+        }
+    }
+    fi.close();
+}
+
+void get_challenge(string levelname){
+    fstream fi;
+    string aux; aux = levelname+"/challenge.in";
+    fi.open(aux,ios::in);
+    int i = 0;
+    while(i < 16){
+        fi>>challenge[i];
+        if(challenge[i] == -1) break;
+        i++;
+    }
+    fi.close();
+}
+
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
     bool is_done = false;
     bool draw = true; //pentru HOW TO
-    bool initiate_challange = true;
+    bool initiate_challenge = true;
     while(gameOpen){
 
         getmouseclick(WM_LBUTTONDOWN,mouseX,mouseY);
@@ -927,10 +932,10 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             //nivelul STARTER
             if(in_border(mouseX,mouseY,535, 372, 866, 427)){
                 clearmouseclick(WM_LBUTTONDOWN);
+                get_shapes("starter/shapes.in");
                 gameStarted = true; in_levels = false;
-                playingStarter = true; level_name = "starter";
-                refresh_shapes("starter");
-                refresh_board(4,0,1); challenge[0] = 8; challenge[1] = 9; challenge[2] = 9;
+                playingStarter = true;
+                refresh_board(4,0,1); get_challenge("starter");
                 get_solution(1);
                 board();
             }
@@ -938,8 +943,10 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             //nivelul JUNIOR
             if(in_border(mouseX,mouseY,535, 372+70, 866, 427+70)){
                 clearmouseclick(WM_LBUTTONDOWN);
+                get_shapes("junior/shapes.in");
                 gameStarted = true; in_levels = false;
-                playingJunior = true; level_name = "junior";
+                playingJunior = true;
+                refresh_board(4,0,2); get_challenge("junior");
                 get_solution(2);
                 board();
             }
@@ -947,9 +954,22 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             //nivelul EXPERT
             if(in_border(mouseX,mouseY,535, 372+140, 866, 427+140)){
                 clearmouseclick(WM_LBUTTONDOWN);
+                get_shapes("expert/shapes.in");
                 gameStarted = true; in_levels = false;
-                playingExpert = true; level_name = "expert";
+                playingExpert = true;
+                refresh_board(4,0,3); get_challenge("expert");
                 get_solution(3);
+                board();
+            }
+
+            //nivelul MASTER
+            if(in_border(mouseX,mouseY,535, 372+210, 866, 427+210)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                get_shapes("master/shapes.in");
+                gameStarted = true; in_levels = false;
+                playingMaster = true;
+                refresh_board(4,0,4); get_challenge("master");
+                get_solution(4);
                 board();
             }
 
@@ -958,22 +978,13 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 //close_level();
                 clearmouseclick(WM_LBUTTONDOWN);
                 in_levels = false; gameStarted = true;
-                playingGenerated = true; level_name = "generated";
+                playingGenerated = true;
                 read_shapes();
                 refresh_board(4,0,5);
                 generate_challenge();
-                print_challange();
+                print_challenge();
                 board();
-                display_challange(400,42);
-            }
-
-            //nivelul MASTER
-            if(in_border(mouseX,mouseY,535, 372+210, 866, 427+210)){
-                clearmouseclick(WM_LBUTTONDOWN);
-                gameStarted = true; in_levels = false;
-                playingMaster = true; level_name = "master";
-                get_solution(4);
-                board();
+                display_challenge(400,42);
             }
 
             //tutorial
