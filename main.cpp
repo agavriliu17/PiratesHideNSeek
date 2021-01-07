@@ -12,7 +12,7 @@ using namespace std;
 int black[3] = {0,0,0};
 int white[3] = {255,255,255};
 int dark_blue[3] = {29, 85, 173};
-int sea_blue[3] = {152, 65, 21};
+int wood_brown[3] = {152, 65, 21};
 int green[3] = {0,255,0};
 int light_blue[3] = {14, 197, 219};
 int blue_1[3] = {0, 105, 148};
@@ -31,6 +31,7 @@ bool in_levels = false; //verifica daca ne aflam in pagina cu nivele
 bool gameStarted = false; //variabila ce verifica daca s-a inceput jocul
 bool in_settings = false; //variabila ce verifica daca suntem in setari
 bool in_tutorial = false;
+bool in_gameMode = true;
 bool playingStarter = false, playingJunior = false, playingExpert = false, playingMaster = false, playingGenerated = false; //variabile ce verifica nivelul selectat
 bool in_english = true;
 bool win_screen = false;
@@ -51,7 +52,7 @@ struct coordonatePiese {
 
 
 int challenge[16] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-int board_matrix[4][3][3];
+int board_matrix[4][3][3]; string level_name;
 int solution[4];
 int solution_rotation[4];
 
@@ -115,7 +116,9 @@ void refresh_board(int squares, int first_poz, int selected_level){ //citeste di
 
 void read_shapes(){
     ifstream fi;
+    ofstream fo;
     string aux;
+    fo.open("generated/saved_shapes.in",ios::trunc);
     fi.open("generated/shapes.in", ios::in);
     srand(time(0));
     int na[4] = {-1,-1,-1,-1}, rng, k = 0;
@@ -131,9 +134,10 @@ void read_shapes(){
             for(int i = 0; i < 3; i++){
                 for(int j = 0; j < 3; j++){
                     fi>>shapes[k][i][j];
-
+                    fo<<shapes[k][i][j]<<" ";
                 }
             }
+            fo<<endl;
             na[k] = rng;
             k++;
             fi.clear();
@@ -217,12 +221,24 @@ void copy_matrix(int m1[3][3], int m2[3][3]){//copie m2 in m1
     }
 }
 
+void get_shapes(string filename){
+    fstream fi;
+    fi.open(filename,ios::in);
+    for(int k = 0 ; k < 4; k++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                fi>>shapes[k][i][j];
+            }
+        }
+    }
+    fi.close();
+}
 
 void menu(){ //plaseaza fundalul si textul ferestrei de meniu
     readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 6);
-    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
 
     //start
     bar(575, 320, 829, 392);
@@ -251,23 +267,48 @@ void menu(){ //plaseaza fundalul si textul ferestrei de meniu
 
 }
 
+void gameMode(){
+    readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
+    setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+    settextstyle(BOLD_FONT, HORIZ_DIR, 6);
+    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+
+    if(in_english){
+        bar(490, 268, 910, 356);
+        outtextxy(700-textwidth("HOW TO PLAY")/2, 312-textheight("H")/2, "HOW TO PLAY");
+
+        bar(507, 394, 893, 468);
+        outtextxy(700-textwidth("CLASSIC")/2, 431-textheight("C")/2, "CLASSIC");
+
+        bar(507, 506, 893, 580);
+        outtextxy(700-textwidth("GENERATED")/2, 543-textheight("G")/2, "GENERATED");
+
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        bar(307, 609, 452, 664);
+        outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+    else{
+        bar(490, 268, 910, 356);
+        outtextxy(700-textwidth("CUM JUCAM")/2, 312-textheight("C")/2, "CUM JUCAM");
+
+        bar(507, 394, 893, 468);
+        outtextxy(700-textwidth("CLASIC")/2, 431-textheight("C")/2, "CLASIC");
+
+        bar(507, 506, 893, 580);
+        outtextxy(700-textwidth("GENERAT")/2, 543-textheight("G")/2, "GENERAT");
+
+        settextstyle(BOLD_FONT, HORIZ_DIR, 5);
+        bar(307, 609, 452, 664);
+        outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+    }
+
+}
+
 void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-
-
-    //how to play
-
-    bar(534, 257, 865, 311);
-    if(in_english){
-        outtextxy(700-textwidth("HOW TO PLAY")/2, 284-textheight("H")/2, "HOW TO PLAY");
-    }
-    else{
-        outtextxy(700-textwidth("CUM JOCAM")/2, 284-textheight("C")/2, "CUM JUCAM");
-    }
-
+    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
 
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
     //starter
@@ -298,23 +339,14 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     else{
         outtextxy(379-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
     }
-    //generated level
-    settextstyle(BOLD_FONT, HORIZ_DIR, 3);
-    bar(949, 509, 1140, 564);
-    if(in_english){
-        outtextxy(1044-textwidth("GENERATED")/2, 536-textheight("G")/2, "GENERATED");
-    }
-    else{
-        outtextxy(1044-textwidth("GENERAT")/2, 536-textheight("G")/2, "GENERAT");
-    }
 }
 
-/*void playMusic(bool music){
+void playMusic(bool music){
   if (music==true)
-    PlaySound(TEXT("pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
+    PlaySound(TEXT("audio/pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
     PlaySound(NULL, 0, 0);
-}*/
+}
 
 void settings(){ //plaseaza fundalul si textul ferestrei setari
     readimagefile("settingsbkg.jpg",0,0,screenWidth,screenHeight);
@@ -360,7 +392,7 @@ void settings(){ //plaseaza fundalul si textul ferestrei setari
     }
 
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
-    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
     bar(307, 609, 452, 664);
     if(in_english){
         outtextxy(379-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
@@ -384,7 +416,7 @@ void howto(int step)
 
         setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
         bar(628, 590, 773, 645);
         if(step<3)
             outtextxy(700-textwidth("NEXT")/2, 618-textheight("N")/2, "NEXT");
@@ -402,7 +434,7 @@ void howto(int step)
 
         setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
         bar(628, 590, 773, 645);
         if(step<3)
             outtextxy(700-textwidth("URMATOR")/2, 618-textheight("U")/2, "URMATOR");
@@ -432,7 +464,7 @@ void board(){
                             if(playingGenerated)
                             readimagefile("generated/generated.jpg",0,0,screenWidth,screenHeight);
     //The shapes:
-    setfillstyle(SOLID_FILL, COLOR(0, 105, 148)); //sea_blue
+    setfillstyle(SOLID_FILL, COLOR(0, 105, 148)); //wood_brown
 
     shape_container(shapes, 101, 79, 400, blue_2, light_blue, 0);
     matrix_coord[0].x=101; matrix_coord[0].y=79;
@@ -449,7 +481,7 @@ void board(){
     //Back button
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
     bar(333, 609, 478, 664);
     if(in_english){
         outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
@@ -494,24 +526,22 @@ void close_level(){
         challenge[i] = -1;
     }
     is_selected = false;
-
-    in_levels = true; gameStarted = false;
-
-                if (playingStarter)
-                    playingStarter=false;
-                else
-                    if (playingJunior)
-                        playingJunior=false;
-                    else
-                        if (playingExpert)
-                            playingExpert=false;
-                        else
-                            if (playingMaster)
-                                playingMaster = false;
-                            else
-                                if (playingGenerated)
-                                    playingGenerated = false;
-
+    if(!playingGenerated){
+        cout<<"Returning to levels!"<<endl;
+        in_levels = true;
+        levels();
+    }
+    else{
+        cout<<"Returning to gameModes!"<<endl;
+        in_gameMode = true;
+        gameMode();
+    }
+    gameStarted = false;
+    playingStarter = false;
+    playingJunior = false;
+    playingExpert = false;
+    playingMaster = false;
+    playingGenerated = false;
 }
 
 bool all_placed(){
@@ -684,25 +714,16 @@ void generate_challenge(){
 }
 
 void print_challenge(){
+    ofstream fo;
+    fo.open("generated/challenge.in",ios::trunc);
     int i = 0;
     while(challenge[i] != -1 && i < 16){
-        cout<<challenge[i]<<" ";
+        fo<<challenge[i]<<" ";
         i++;
     }
     if(challenge[0] == -1){
         cout<<"Challenge empty!"<<endl;
     }
-    /*cout<<endl<<"Shapes: "<<endl;
-    for(int k = 0; k < 4; k++){
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                cout<<shapes[k][i][j]<<" ";
-            }
-            cout<<endl;
-        }
-        cout<<endl;
-    }*/
-
 }
 
 void display_challenge(int startX, int startY){ //deafult shall be x = 300 y = 42 size: 600 X 90
@@ -744,7 +765,6 @@ void display_challenge(int startX, int startY){ //deafult shall be x = 300 y = 4
     }
 }
 //End
-
 void refresh_challenge(){
     for(int i = 0; i < 16; i++){
         challenge[i] = -1;
@@ -752,74 +772,98 @@ void refresh_challenge(){
 }
 
 void won(){
-    //cout<<"Entered function!"<<endl;
+    PlaySound(TEXT("audio/winSound.wav"), NULL, SND_FILENAME|SND_ASYNC);
+    setbkcolor(COLOR(139, 194, 234));
+    setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
     if(in_english){
-        //cout<<"Got english!"<<endl;
-        readimagefile("aux_img/won_en.jpg",0,0,screenWidth,screenHeight);
 
-        //back
-        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        bar(413, 207, 993, 493);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 7);
+        outtextxy(703-textwidth("YOU WON")/2, 250-textheight("Y")/2, "YOU WON");
+
+
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-        bar(333, 609, 478, 664);
-        outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+        setfillstyle(SOLID_FILL, COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+        bar(610, 423, 791, 473);
+        outtextxy(700-textwidth("OK")/2, 450-textheight("O")/2, "OK");
+
     }
     else{
-        //cout<<"Got romanian!"<<endl;
-        readimagefile("aux_img/won_ro.jpg",0,0,screenWidth,screenHeight);
 
-        //back
-        setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
+        bar(413, 207, 993, 493);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 7);
+        outtextxy(703-textwidth("VICTORIE")/2, 250-textheight("V")/2, "VICTORIE");
+
+
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-        bar(333, 609, 478, 664);
-        outtextxy(405-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+        setfillstyle(SOLID_FILL, COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+        bar(610, 423, 791, 473);
+        outtextxy(700-textwidth("OK")/2, 450-textheight("O")/2, "OK");
     }
 }
 
 void lost(){
-
+    PlaySound(TEXT("audio/loseSound.wav"), NULL, SND_FILENAME|SND_ASYNC);
+    setbkcolor(COLOR(139, 194, 234));
+    setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
     if(in_english){
 
-        readimagefile("aux_img/lost_en.jpg",0,0,screenWidth,screenHeight);
+        bar(413, 207, 993, 493);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 7);
+        outtextxy(703-textwidth("YOU LOST")/2, 250-textheight("Y")/2, "YOU LOST");
 
-        //back
         setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-        bar(333, 609, 478, 664);
-        outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+
+        bar(469, 423, 649, 473);
+        outtextxy(559-textwidth("LEVELS")/2, 450-textheight("L")/2, "LEVELS");
+
+        bar(760, 423, 940, 473);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 4);
+        outtextxy(850-textwidth("TRY AGAIN")/2, 450-textheight("T")/2, "TRY AGAIN");
     }
     else{
 
-        readimagefile("aux_img/lost_ro.jpg",0,0,screenWidth,screenHeight);
+        bar(413, 207, 993, 493);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 7);
+        outtextxy(703-textwidth("AI PIERDUT")/2, 250-textheight("A")/2, "AI PIERDUT");
 
-        //back
         setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
         settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-        setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
-        bar(333, 609, 478, 664);
-        outtextxy(405-textwidth("INAPOI")/2, 636-textheight("I")/2, "INAPOI");
+        setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
+
+        bar(469, 423, 649, 473);
+        outtextxy(559-textwidth("NIVELE")/2, 450-textheight("NIVELE")/2, "NIVELE");
+
+        bar(760, 423, 940, 473);
+        settextstyle(BOLD_FONT, HORIZ_DIR, 4);
+        outtextxy(850-textwidth("DIN NOU")/2, 450-textheight("D")/2, "DIN NOU");
     }
 }
 
 void get_solution(int level){
     if(level == 1){ //starter
-        solution[0] = 1; solution[1] = 0; solution[2] = 2; solution[3] = 3;
-        solution_rotation[0] = 3; solution_rotation[1] = 2; solution_rotation[2] = 3; solution_rotation[3] = 1;
+        solution[0] = 1; solution[1] = 2; solution[2] = 2; solution[3] = 3;
+        solution_rotation[0] = 0; solution_rotation[1] = 0; solution_rotation[2] = 3; solution_rotation[3] = 1;
     }
     else if(level == 2){//junior
-
+        solution[0] = 1; solution[1] = 2; solution[2] = 0; solution[3] = 3;
+        solution_rotation[0] = 1; solution_rotation[1] = 2; solution_rotation[2] = 3; solution_rotation[3] = 0;
     }
     else if(level == 3){//expert
-
+        solution[0] = 2; solution[1] = 0; solution[2] = 1; solution[3] = 3;
+        solution_rotation[0] = 3; solution_rotation[1] = 1; solution_rotation[2] = 0; solution_rotation[3] = 1;
     }
     else if(level == 4){//master
-
+        solution[0] = 0; solution[1] = 1; solution[2] = 3; solution[3] = 2;
+        solution_rotation[0] = 2; solution_rotation[1] = 2; solution_rotation[2] = 1; solution_rotation[3] = 0;
     }
 }
 
-void give_hint(){
+void give_hint(int aux_arr[4]){
     bool is_hint = false;
     int square_num; int piece; int nr;
     int aux_mat[3][3];
@@ -827,6 +871,7 @@ void give_hint(){
         if(!placed_pieces[i]){
             square_num = i; piece = solution[square_num];
             if(available[piece]) {
+                    aux_arr[square_num] = piece;
                     is_hint = true;
                     break;
             }
@@ -869,19 +914,6 @@ void give_hint(){
     }
 }
 
-void get_shapes(string filename){
-    fstream fi;
-    fi.open(filename,ios::in);
-    for(int k = 0 ; k < 4; k++){
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                fi>>shapes[k][i][j];
-            }
-        }
-    }
-    fi.close();
-}
-
 void get_challenge(string levelname){
     fstream fi;
     string aux; aux = levelname+"/challenge.in";
@@ -894,6 +926,67 @@ void get_challenge(string levelname){
     }
     fi.close();
 }
+
+void tryAgain(){
+
+    for(int i=0;i<4;i++){
+        available[i] = true;
+        placed_pieces[i] = false;
+    }
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            selected_matrix[i][j] = 0;
+        }
+    }
+    for(int i = 0; i < 16; i++){
+        challenge[i] = -1;
+    }
+    is_selected = false;
+    in_levels=false; in_gameMode = false;
+    gameStarted=true;
+    if (playingStarter){
+        level_name = "starter";
+        get_shapes("starter/shapes.in");
+        refresh_board(4,0,1);
+        get_challenge("starter");
+        board();
+    }
+    else
+        if (playingJunior){
+            level_name = "junior";
+            get_shapes("junior/shapes.in");
+            refresh_board(4,0,2);
+            get_challenge("junior");
+            board();
+        }
+        else
+            if (playingExpert){
+                level_name = "expert";
+                get_shapes("expert/shapes.in");
+                refresh_board(4,0,3);
+                get_challenge("expert");
+                board();
+            }
+            else
+                if (playingMaster){
+                    level_name = "master";
+                    get_shapes("master/shapes.in");
+                    refresh_board(4,0,4);
+                    get_challenge("master");
+                    board();
+                }
+                else
+                    if (playingGenerated){
+                        level_name = "generated";
+                        get_shapes("generated/saved_shapes.in");
+                        refresh_board(4,0,5);
+                        get_challenge("generated");
+                        board();
+                        display_challenge(400,42);
+
+                    }
+}
+
 
 bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
     bool is_done = false;
@@ -908,8 +1001,9 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
         if(in_menu){//atat timp cat suntem in meniu
             if(in_border(mouseX, mouseY, 575, 320, 829, 392)){ //intram pe pagina cu nivele
                 clearmouseclick(WM_LBUTTONDOWN);
-                in_levels = true; in_menu = false;
-                levels();
+                mouseX = 0; mouseY = 0;
+                in_gameMode = true; in_menu = false;
+                gameMode();
             }
             if(in_border(mouseX, mouseY, 575, 320+120, 829, 392+120)){ //intram in setari
                 clearmouseclick(WM_LBUTTONDOWN);
@@ -922,11 +1016,48 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
         }
 
+        if(in_gameMode){
+
+            //how to play
+            if(in_border(mouseX,mouseY, 490, 268, 910, 356)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_gameMode = false; in_tutorial = true;
+                step = 1;
+            }
+
+            //classic
+            if(in_border(mouseX,mouseY, 507, 394, 893, 468)){
+                clearmouseclick(WM_LBUTTONDOWN); mouseX = mouseY = 0;
+                in_gameMode = false; in_levels = true;
+                levels();
+            }
+            //nivelul Generated
+            if(in_border(mouseX, mouseY, 507, 506, 893, 580)){
+                //close_level();
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_gameMode = false; gameStarted = true;
+                playingGenerated = true;
+                read_shapes();
+                refresh_board(4,0,5);
+                generate_challenge();
+                print_challenge();
+                board();
+                display_challenge(400,42);
+            }
+
+            //back
+            if(in_border(mouseX, mouseY, 307,609, 452,664)){
+                clearmouseclick(WM_LBUTTONDOWN);
+                in_gameMode = false; in_menu = true;
+                menu();
+            }
+        }
+
         if(in_levels){//atat timp cat suntem pe pagina 'nivele'
             if(in_border(mouseX, mouseY, 307,609, 452,664)){ //revenim in meniu
                 clearmouseclick(WM_LBUTTONDOWN);
-                in_levels = false; in_menu = true;
-                menu();
+                in_levels = false; in_gameMode = true;
+                gameMode();
             }
 
             //nivelul STARTER
@@ -973,27 +1104,6 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 board();
             }
 
-            //nivelul Generated
-            if(in_border(mouseX, mouseY, 949, 509, 1140, 564)){
-                //close_level();
-                clearmouseclick(WM_LBUTTONDOWN);
-                in_levels = false; gameStarted = true;
-                playingGenerated = true;
-                read_shapes();
-                refresh_board(4,0,5);
-                generate_challenge();
-                print_challenge();
-                board();
-                display_challenge(400,42);
-            }
-
-            //tutorial
-            if(in_border(mouseX,mouseY,534, 257, 865, 311)){
-                clearmouseclick(WM_LBUTTONDOWN);
-                in_levels = false; in_tutorial = true;
-                step = 1;
-            }
-
         }
         if(gameStarted){
 
@@ -1001,28 +1111,28 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             //placed contorizeaza numarul pieselor plasate
             //selectarea figurilor
             if(in_border(mouseX,mouseY, 101, 79, 304, 332) && available[0] && !is_selected){
-                nr=0;
+                nr=0; clearmouseclick(WM_LBUTTONDOWN);
                 copy_matrix(selected_matrix , shapes[0]);
                 shape_container(shapes, 101, 79, 400, blue_2, blue_1, 0);
                 is_selected = true;
                 available[0] = 0;
             }
             if(in_border(mouseX,mouseY, 101, 377, 304, 630) && available[1] && !is_selected){
-                nr=1;
+                nr=1; clearmouseclick(WM_LBUTTONDOWN);
                 copy_matrix(selected_matrix , shapes[1]);
                 shape_container(shapes, 101, 377, 400, blue_2, blue_1, 1);
                 is_selected = true;
                 available[1] = 0;
             }
             if(in_border(mouseX,mouseY, 1085, 79, 1338, 332) && available[2] && !is_selected){
-                nr=2;
+                nr=2; clearmouseclick(WM_LBUTTONDOWN);
                 copy_matrix(selected_matrix , shapes[2]);
                 shape_container(shapes, 1085, 79, 400, blue_2, blue_1, 2);
                 is_selected = true;
                 available[2] = 0;
             }
             if(in_border(mouseX,mouseY, 1085, 377, 1338, 630) && available[3] && !is_selected){
-                nr=3;
+                nr=3; clearmouseclick(WM_LBUTTONDOWN);
                 copy_matrix(selected_matrix , shapes[3]);
                 shape_container(shapes, 1085, 377, 400, blue_2, blue_1, 3);
                 is_selected = true;
@@ -1033,7 +1143,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 
             //plasarea figurilor
             if (is_selected && in_border(mouseX,mouseY, 533, 200, 691, 368) && !placed_pieces[0]){
-                placed++;
+                placed++; clearmouseclick(WM_LBUTTONDOWN);
                 nrtemp[0]=nr;
                 placed_pieces[0] = true; hide_matrix(board_matrix[0],selected_matrix);
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
@@ -1043,7 +1153,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
             else
                if (!is_selected && in_border(mouseX,mouseY, 533, 200, 691, 368) && placed_pieces[0]){
-                    placed--;
+                    placed--; clearmouseclick(WM_LBUTTONDOWN);
                     if(playingStarter){
                         readimagefile("starter/panou1.jpg", 533, 200, 533+158, 200+158);
                         refresh_board(1,0,1);
@@ -1071,7 +1181,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 
 
             if (is_selected && in_border(mouseX,mouseY, 533, 372, 691, 545) && !placed_pieces[2]){
-                placed++;
+                placed++; clearmouseclick(WM_LBUTTONDOWN);
                 nrtemp[1]=nr;
                 placed_pieces[2] = true; hide_matrix(board_matrix[2],selected_matrix);
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
@@ -1080,7 +1190,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
             else
                 if (!is_selected && in_border(mouseX,mouseY, 533, 372, 691, 545) && placed_pieces[2]){
-                    placed--;
+                    placed--; clearmouseclick(WM_LBUTTONDOWN);
                     //readimagefile(img2, 533, 372, 533+158, 372+158);
                     if(playingStarter){
                         readimagefile("starter/panou3.jpg", 533, 372, 533+158, 372+158);
@@ -1108,7 +1218,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                }
 
             if (is_selected && in_border(mouseX,mouseY, 710, 200, 869, 368) && !placed_pieces[1]){
-                placed++;
+                placed++; clearmouseclick(WM_LBUTTONDOWN);
                 nrtemp[2]=nr;
                 placed_pieces[1] = true; hide_matrix(board_matrix[1],selected_matrix);
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
@@ -1117,7 +1227,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
             else
                 if (!is_selected && in_border(mouseX,mouseY, 710, 200, 869, 368) && placed_pieces[1]){
-                    placed--;
+                    placed--; clearmouseclick(WM_LBUTTONDOWN);
                     //readimagefile(img3, 710, 200, 710+158, 200+158);
                     if(playingStarter) {
                         readimagefile("starter/panou2.jpg", 710, 200, 710+158, 200+158);
@@ -1145,7 +1255,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                }
 
             if (is_selected && in_border(mouseX,mouseY, 710, 372, 869, 545) && !placed_pieces[3]){
-                placed++;
+                placed++; clearmouseclick(WM_LBUTTONDOWN);
                 nrtemp[3]=nr;
                 placed_pieces[3] = true; hide_matrix(board_matrix[3],selected_matrix);
                 square( matrix_coord[nr].x, matrix_coord[nr].y, 200, true, blue_1);
@@ -1154,7 +1264,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
             else
                 if (!is_selected && in_border(mouseX,mouseY, 710, 372, 869, 545) && placed_pieces[3]){
-                    placed--;
+                    placed--; clearmouseclick(WM_LBUTTONDOWN);
                     //readimagefile(img4, 710, 372, 710+158, 372+158);
                     if(playingStarter){
                         readimagefile("starter/panou4.jpg", 710, 372, 710+158, 372+158);
@@ -1181,19 +1291,27 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             //Hint
             if(in_border(mouseX, mouseY, 970, 609, 1145, 664) && hint_available){
                 clearmouseclick(WM_LBUTTONDOWN);
-                give_hint();
+                give_hint(nrtemp);
             }
 
             //Back
-            if (in_border(mouseX, mouseY, 307, 609, 452, 664) && !all_placed()){
+            if (in_border(mouseX, mouseY, 307, 609, 452, 664) && !all_placed() && !playingGenerated){
+                clearmouseclick(WM_LBUTTONDOWN);
                 close_level();
                 levels();
                 hint_available = true;
             }
-
+            if (in_border(mouseX, mouseY, 307, 609, 452, 664) && !all_placed() && playingGenerated){
+                clearmouseclick(WM_LBUTTONDOWN);
+                close_level();
+                gameMode();
+                hint_available = true;
+            }
             //Rotate / Done
             if(!is_done){
-                if (in_border(mouseX, mouseY, 628, 590, 773, 645) && placed!=4 && is_selected){
+                if (in_border(mouseX, mouseY, 628, 590, 773, 645) && is_selected){
+                    mouseX = mouseY = 0;
+                    clearmouseclick(WM_LBUTTONDOWN);
                     rotate90Clockwise(shapes[nr]);
                     copy_matrix(selected_matrix , shapes[nr]);
                     shape_container(shapes, matrix_coord[nr].x, matrix_coord[nr].y, 400, blue_2, blue_1, nr);
@@ -1205,31 +1323,23 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 hint_available = true;
                 if (in_border(mouseX, mouseY, 628, 590, 773, 645)){
                     if(check_solution()){
-                        cout<<"You Won!";
+                        cout<<"You Won!"<<endl;
+                        gameStarted = false;
                         won(); win_screen = true;
                     }
                     else{
-                        cout<<"You lost!";
+                        cout<<"You lost!"<<endl;
+                        gameStarted = false;
                         lost(); lose_screen = true;
                     }
                     //close_level();
                     //levels();
                 }
             }
-
-            //Win / Lose
-            if(win_screen || lose_screen){ //Back
-                if(in_border(mouseX, mouseY, 307, 609, 452, 664)){
-                    close_level(); levels();
-                    win_screen = false;
-                }
-            }
-
-
             if(!all_placed() && is_done){
                 setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
                 settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-                setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+                setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
                 is_done = false;
                 if(gameStarted){
                     readimagefile("aux_img/img1.jpg",307, 590, 1145, 664);
@@ -1243,7 +1353,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     //Back button
                     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
-                    setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+                    setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
                     bar(333, 609, 478, 664);
                     if(in_english){
                         outtextxy(405-textwidth("BACK")/2, 636-textheight("B")/2, "BACK");
@@ -1266,7 +1376,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             if(all_placed() && !is_done){
                 setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
                 settextstyle(BOLD_FONT, HORIZ_DIR, 6);
-                setbkcolor(COLOR(sea_blue[0],sea_blue[1],sea_blue[2]));
+                setbkcolor(COLOR(wood_brown[0],wood_brown[1],wood_brown[2]));
                 is_done = true;
                 bar(307, 590, 1145, 664);
                 if(in_english){
@@ -1277,6 +1387,33 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 }
             }
 
+        }
+        //Win / Lose
+        if(win_screen){
+            if(in_border(mouseX, mouseY, 413, 207, 993, 493)){
+                win_screen = false;
+                gameStarted = true;
+                cout<<"OK, closing level."<<endl;
+                clearmouseclick(WM_LBUTTONDOWN);
+                mouseX = mouseY = 0;
+                close_level();
+            }
+        }
+        if(lose_screen){
+            //tryAgain(); - trebuie de pus pe click + de facut functie pentru inregistrarea challenge-ului la generated
+            if(in_border(mouseX, mouseY, 469, 423, 649, 473)){
+                lose_screen = false;
+                gameStarted = true;
+                cout<<"OK, closing level."<<endl;
+                clearmouseclick(WM_LBUTTONDOWN);
+                mouseX = mouseY = 0;
+                close_level();
+            }
+            if(in_border(mouseX, mouseY, 760, 423, 940, 473)){
+                lose_screen = false;
+                gameStarted = true;
+                tryAgain();
+            }
         }
         if(in_settings){
             /*if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395){ //music on/off
@@ -1342,8 +1479,9 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     draw = true;
                 }
                 else{
-                    in_tutorial = false; in_levels = true;
-                    levels();
+                    step = 1; draw = true;
+                    in_tutorial = false; in_gameMode = true;
+                    gameMode();
                 }
             }
 
