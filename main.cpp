@@ -70,7 +70,8 @@ void rotate90Clockwise(int a[N][N]) //functie pentru a roti piesa selectata
     }
 }
 
-void refresh_board(int squares, int first_poz, int selected_level){ //citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
+void refresh_board(int squares, int first_poz, int selected_level){ // Creat de: Erhan Adrian
+                                                //                                    citeste din nou matricea tablei de joc: squares - cate patrate trebuie citite,
                                                 //                                        first_poz - de la care patrat incepem citirea
     ifstream fi; string aux;
     if (selected_level == 1){
@@ -114,7 +115,7 @@ void refresh_board(int squares, int first_poz, int selected_level){ //citeste di
     fi.close();
 }
 
-void read_shapes(){
+void read_shapes(){ // Creat de: Erhan Adrian
     ifstream fi;
     ofstream fo;
     string aux;
@@ -148,7 +149,8 @@ void read_shapes(){
 }
 //End
 
-void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
+void hide_matrix(int a[][3],int b[][3]){// Creat de: Erhan Adrian
+                                        //logica pentru suprapunerea matricelor
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
             if(b[i][j]==1){
@@ -158,7 +160,8 @@ void hide_matrix(int a[][3],int b[][3]){//logica pentru suprapunerea matricelor
     }
 }
 
-void square(int x, int y, int size, bool fillshape,int color[3]){ //deseneaza un patrat cu coordonatele coltului stang sus (x,y), latura de marime size si culoarea rgb color,
+void square(int x, int y, int size, bool fillshape,int color[3]){ // Creat de: Erhan Adrian
+                                                                  //deseneaza un patrat cu coordonatele coltului stang sus (x,y), latura de marime size si culoarea rgb color,
                                                                   //daca fillshape e true se umple interiorul patratului cu culoarea selectata
     int shape[8] = {x,y, (x+size),y, (x+size),(y+size), x,(y+size)};
     if (fillshape){
@@ -173,14 +176,15 @@ void square(int x, int y, int size, bool fillshape,int color[3]){ //deseneaza un
     }
 }
 
-void fill_rect(int x, int y, int size_x, int size_y, int color[3]){ //umple un dreptunghi cu laturile size_x size_y si coordonatele (x,y), coloarea rgb - color
+void fill_rect(int x, int y, int size_x, int size_y, int color[3]){ // Creat de: Erhan Adrian
+                                                                    //umple un dreptunghi cu laturile size_x size_y si coordonatele (x,y), coloarea rgb - color
     int shape[8] = {x,y, (x+size_x),y, (x+size_x),(y+size_y), x,(y+size_y)};
     setfillstyle(SOLID_FILL,COLOR(color[0], color[1], color[2]));
     fillpoly(4,shape);
 
 }
 
-void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){
+void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){ // Creat de: Erhan Adrian
     //setcolor(RGB(light_blue[0], light_blue[1], light_blue[2]));
     int initial_x = x;
     for(int i=0;i<3;i++){
@@ -199,7 +203,7 @@ void draw_shape(int m[3][3], int x, int y, int lsize, int color[3]){
     }
 }
 
-void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int color1[3], int color2[3], int nrPiesa){
+void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int color1[3], int color2[3], int nrPiesa){ // Creat de: Erhan Adrian
     //c_x++; c_y++;
     //c_size -= 2;
     square( c_x, c_y, c_size/2-1, true, color1);
@@ -208,12 +212,13 @@ void shape_container(int matrix[4][3][3], int c_x, int c_y, int c_size, int colo
     draw_shape(matrix[nrPiesa],c_x,c_y,shape_size, color2);
 }
 
-bool in_border(int mX, int mY, int x, int y, int x1, int y1){
+bool in_border(int mX, int mY, int x, int y, int x1, int y1){ // Creat de: Erhan Adrian
     if (mX >= x && mX <= x1 && mY >= y && mY <= y1) return true;
     return false;
 }
 
-void copy_matrix(int m1[3][3], int m2[3][3]){//copie m2 in m1
+void copy_matrix(int m1[3][3], int m2[3][3]){// Creat de: Erhan Adrian
+                                                //copie m2 in m1
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
             m1[i][j] = m2[i][j];
@@ -221,7 +226,7 @@ void copy_matrix(int m1[3][3], int m2[3][3]){//copie m2 in m1
     }
 }
 
-void get_shapes(string filename){
+void get_shapes(string filename){ // Creat de: Erhan Adrian
     fstream fi;
     fi.open(filename,ios::in);
     for(int k = 0 ; k < 4; k++){
@@ -267,7 +272,7 @@ void menu(){ //plaseaza fundalul si textul ferestrei de meniu
 
 }
 
-void gameMode(){
+void gameMode(){ // Creat de: Gavriliu Alin
     readimagefile("menu_background.jpg",0,0,screenWidth,screenHeight);
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 6);
@@ -341,7 +346,7 @@ void levels(){ //pagina pentru selectarea gradului de dificultate a jocului
     }
 }
 
-void playMusic(bool music){
+void playMusic(bool music){ // Creat de: Gavriliu Alin
   if (music==true)
     PlaySound(TEXT("audio/pirates.wav"), NULL, SND_FILENAME|SND_ASYNC);
   else
@@ -404,7 +409,7 @@ void settings(){ //plaseaza fundalul si textul ferestrei setari
 }
 
 void howto(int step)
-{
+{ // Creat de: Gavriliu Alin
     if(in_english){
        if(step==1)
             readimagefile("english/howto1.jpg",0,0,screenWidth,screenHeight);
@@ -444,7 +449,7 @@ void howto(int step)
 
 }
 
-void board(){
+void board(){ // Creat de: Gavriliu Alin
     setfillstyle(SOLID_FILL, COLOR(152, 65, 21));
     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
 
@@ -512,7 +517,7 @@ void board(){
 
 }
 
-void close_level(){
+void close_level(){ // Creat de: Erhan Adrian + Gavriliu Alin
     for(int i=0;i<4;i++){
         available[i] = true;
         placed_pieces[i] = false;
@@ -544,7 +549,7 @@ void close_level(){
     playingGenerated = false;
 }
 
-bool all_placed(){
+bool all_placed(){ // Creat de: Erhan Adrian
     for(int i = 0; i<4; i++){
         if(placed_pieces[i] == false) return false;
     }
@@ -552,7 +557,7 @@ bool all_placed(){
     return true;
 }
 
-bool check_solution(){
+bool check_solution(){ // Creat de: Erhan Adrian
     /*cout<<"Board Matrix result: "<<endl;
     for(int k = 0; k < 4; k++){
         for(int i = 0; i < 3; i++){
@@ -629,7 +634,7 @@ bool check_solution(){
 
 
 //Challenge generator
-void generate_challenge(){
+void generate_challenge(){ // Creat de: Erhan Adrian
     int used_numbers[4] = {-1,-1,-1,-1};
     int k = 0, aux;
     int aux_matrix[3][3];
@@ -713,7 +718,7 @@ void generate_challenge(){
 
 }
 
-void print_challenge(){
+void print_challenge(){ // Creat de: Erhan Adrian
     ofstream fo;
     fo.open("generated/challenge.in",ios::trunc);
     int i = 0;
@@ -726,7 +731,7 @@ void print_challenge(){
     }
 }
 
-void display_challenge(int startX, int startY){ //deafult shall be x = 300 y = 42 size: 600 X 90
+void display_challenge(int startX, int startY){ // Creat de: Erhan Adrian
 
     setfillstyle(SOLID_FILL, COLOR(252, 243, 134));
     //bar(startX, startY, startX + 610, startY + 90);
@@ -765,13 +770,13 @@ void display_challenge(int startX, int startY){ //deafult shall be x = 300 y = 4
     }
 }
 //End
-void refresh_challenge(){
+void refresh_challenge(){ // Creat de: Erhan Adrian
     for(int i = 0; i < 16; i++){
         challenge[i] = -1;
     }
 }
 
-void won(){
+void won(){ // Creat de: Erhan Adrian + Gavriliu Alin
     PlaySound(TEXT("audio/winSound.wav"), NULL, SND_FILENAME|SND_ASYNC);
     setbkcolor(COLOR(139, 194, 234));
     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
@@ -804,7 +809,7 @@ void won(){
     }
 }
 
-void lost(){
+void lost(){ // Creat de: Erhan Adrian + Gavriliu Alin
     PlaySound(TEXT("audio/loseSound.wav"), NULL, SND_FILENAME|SND_ASYNC);
     setbkcolor(COLOR(139, 194, 234));
     setfillstyle(SOLID_FILL, COLOR(139, 194, 234));
@@ -844,7 +849,7 @@ void lost(){
     }
 }
 
-void get_solution(int level){
+void get_solution(int level){ // Creat de: Erhan Adrian
     if(level == 1){ //starter
         solution[0] = 1; solution[1] = 2; solution[2] = 2; solution[3] = 3;
         solution_rotation[0] = 0; solution_rotation[1] = 0; solution_rotation[2] = 3; solution_rotation[3] = 1;
@@ -863,7 +868,7 @@ void get_solution(int level){
     }
 }
 
-void give_hint(int aux_arr[4]){
+void give_hint(int aux_arr[4]){ // Creat de: Erhan Adrian
     bool is_hint = false;
     int square_num; int piece; int nr;
     int aux_mat[3][3];
@@ -914,7 +919,7 @@ void give_hint(int aux_arr[4]){
     }
 }
 
-void get_challenge(string levelname){
+void get_challenge(string levelname){ // Creat de: Erhan Adrian
     fstream fi;
     string aux; aux = levelname+"/challenge.in";
     fi.open(aux,ios::in);
@@ -927,7 +932,7 @@ void get_challenge(string levelname){
     fi.close();
 }
 
-void tryAgain(){
+void tryAgain(){ // Creat de: Gavriliu Alin
 
     for(int i=0;i<4;i++){
         available[i] = true;
@@ -1032,7 +1037,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 levels();
             }
             //nivelul Generated
-            if(in_border(mouseX, mouseY, 507, 506, 893, 580)){
+            if(in_border(mouseX, mouseY, 507, 506, 893, 580)){// Creat de: Erhan Adrian
                 //close_level();
                 clearmouseclick(WM_LBUTTONDOWN);
                 in_gameMode = false; gameStarted = true;
@@ -1105,7 +1110,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
 
         }
-        if(gameStarted){
+        if(gameStarted){// Creat de: Gavriliu Alin + Erhan Adrian
 
             int nr;
             //placed contorizeaza numarul pieselor plasate
@@ -1389,7 +1394,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
 
         }
         //Win / Lose
-        if(win_screen){
+        if(win_screen){ // Creat de: Gavriliu Alin + Erhan Adrian
             if(in_border(mouseX, mouseY, 413, 207, 993, 493)){
                 win_screen = false;
                 gameStarted = true;
@@ -1399,7 +1404,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 close_level();
             }
         }
-        if(lose_screen){
+        if(lose_screen){ // Creat de: Gavriliu Alin + Erhan Adrian
             //tryAgain(); - trebuie de pus pe click + de facut functie pentru inregistrarea challenge-ului la generated
             if(in_border(mouseX, mouseY, 469, 423, 649, 473)){
                 lose_screen = false;
@@ -1415,8 +1420,8 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                 tryAgain();
             }
         }
-        if(in_settings){
-            /*if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395){ //music on/off
+        if(in_settings){ // Creat de: Gavriliu Alin
+            if(mouseX > 853 && mouseX < 936 && mouseY > 340 && mouseY < 395){ //music on/off
                 clearmouseclick(WM_LBUTTONDOWN);
                 if (music==true)
                 {
@@ -1426,7 +1431,13 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
                     bar(853, 340, 936, 395);
-                    outtextxy(895-textwidth("OFF")/2, 367-textheight("O")/2, "OFF");
+                    if(in_english){
+                        outtextxy(895-textwidth("OFF")/2, 367-textheight("O")/2, "OFF");
+                    }
+                    else{
+                        outtextxy(895-textwidth("NU")/2, 367-textheight("N")/2, "NU");
+                    }
+
                 }
                 else
                 {
@@ -1436,9 +1447,14 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
                     settextstyle(BOLD_FONT, HORIZ_DIR, 5);
                     setbkcolor(COLOR(139, 194, 234));
                     bar(853, 340, 936, 395);
-                    outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+                    if(in_english){
+                        outtextxy(895-textwidth("ON")/2, 367-textheight("O")/2, "ON");
+                    }
+                    else{
+                        outtextxy(895-textwidth("DA")/2, 367-textheight("D")/2, "DA");
+                    }
                 }
-            }*/
+            }
             if(in_border(mouseX,mouseY,307, 609, 452, 664)){
                 clearmouseclick(WM_LBUTTONDOWN);
                 in_settings = false; in_menu = true;
@@ -1465,7 +1481,7 @@ bool startGame(){// ciclul principal al jocului unde are loc procesarea logicii
             }
         }
 
-        if(in_tutorial){
+        if(in_tutorial){ // Creat de: Gavriliu Alin
 
             if(draw){
                 draw = false;
